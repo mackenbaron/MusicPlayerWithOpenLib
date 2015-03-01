@@ -30,14 +30,10 @@ animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许�
 
 
 ##部署
-*获取源文件
-
-*获取附件 resource.zip, dll.zip
-
-*在项目中添加 源文件 sdl  libzplay 和 libiconv的头文件和链接库
-
-*编译
-
-*在目录下解压resource.zip, dll.zip
-
-*运行
+*获取源文件<br>
+*获取附件 resource.zip, dll.zip<br>
+*在项目中添加 源文件 sdl  libzplay 和 libiconv的头文件和链接库<br>
+*编译<br>
+*在目录下解压resource.zip, dll.zip<br>
+*运行<br>
+*去掉头文件orz_option.h里的 #define CodeDebug 可以消除调试的红线<br>
