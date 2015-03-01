@@ -33,6 +33,7 @@ animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许�
 *获取源文件<br>
 *获取附件 resource.zip, dll.zip<br>
 *在项目中添加 源文件 sdl  libzplay 和 libiconv的头文件和链接库<br>
+*注释掉头文件orz_option.h里的 #define CodeDebug(否则会有红色调试线条出现)
 *编译<br>
 *在目录下解压resource.zip, dll.zip<br>
-*运行<br>
+**`!!!!!重要`修改resource\playlist.m3u添加歌曲,运行<br>
