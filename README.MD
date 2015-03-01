@@ -24,6 +24,8 @@ animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许�
 灵感源自哔哩哔哩的[这个视频](http://www.bilibili.com/video/av1750418)
 
 >悄悄告诉你,这是用[StackEdit](https://stackedit.io/)在线编辑器写的 : )
+
+
 ##部署
 *获取源文件
 *获取附件 resource.zip, dll.zip
