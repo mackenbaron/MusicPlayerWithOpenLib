@@ -24,10 +24,9 @@ animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许�
 ###其他
 其实这个项目的名字,不太符合它的内容.因为这是一个音乐播放器.
 
->灵感源自哔哩哔哩的[这个视频](http://www.bilibili.com/video/av1750418)
-
->悄悄告诉你,这是用[StackEdit](https://stackedit.io/)在线编辑器写的 : )
-
+>灵感源自哔哩哔哩的[这个视频](http://www.bilibili.com/video/av1750418)<br>
+>悄悄告诉你,这是用[StackEdit](https://stackedit.io/)在线编辑器写的 : )<br>
+>github: https://github.com/endlesstravel/MusicPlayerWithOpenLib<br>
 
 ##部署
 *获取源文件<br>
