@@ -35,21 +35,21 @@ animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许�
 - [ ] 和bilibili上一模一样
 - [ ] 具有和播放器一样的功能(除了网页模块)
       - [x] 进度条
--     [x] 时间
--     [ ] 玻璃网背景
--     [ ] 粒子效果
--     [ ] 3D三角形背景
-- [x]背景一样
+      - [x] 时间
+      - [ ] 玻璃网背景
+      -     [ ] 粒子效果
+     -     [ ] 3D三角形背景
+- [x] 背景一样
 - 
 - 从程序员的角度看:
 - [x] 实现了动画
 - [ ] 控件
--     [x] 文本控件 ControlText
--     [x] 按钮控件 ControlButton
--     [x] 滚动条控件 ControlBar
--     [x] 列表控件 ControlList
--     [ ] 聚合控件 ConrolPage
--     [ ] 其他控件 ControlXX??
+     -     [x] 文本控件 ControlText
+     -     [x] 按钮控件 ControlButton
+     -     [x] 滚动条控件 ControlBar
+     -     [x] 列表控件 ControlList
+     -     [ ] 聚合控件 ConrolPage
+     -     [ ] 其他控件 ControlXX??
 - [x] 统一加载控件,创建控件
 - [ ] 统一管理控件,以实现控件焦点的概念
 - [ ] 利用XML文件组织画面排版
