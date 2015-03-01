@@ -43,14 +43,16 @@ animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许�
 
 
 - 从程序员的角度看:
+- [x] 可以自动修改注册表,使.MP3文件默认为这个播放
+- [x] 勉强可以运行了
 - [x] 实现了动画
 - [ ] 控件
-     -     [x] 文本控件 ControlText
-     -     [x] 按钮控件 ControlButton
-     -     [x] 滚动条控件 ControlBar
-     -     [x] 列表控件 ControlList
-     -     [ ] 聚合控件 ConrolPage
-     -     [ ] 其他控件 ControlXX??
+      - [x] 文本控件 ControlText
+      - [x] 按钮控件 ControlButton
+      - [x] 滚动条控件 ControlBar
+      - [x] 列表控件 ControlList
+      -  [ ] 聚合控件 ConrolPage
+      - [ ] 其他控件 ControlXX??
 - [x] 统一加载控件,创建控件
 - [ ] 统一管理控件,以实现控件焦点的概念
 - [ ] 利用XML文件组织画面排版
