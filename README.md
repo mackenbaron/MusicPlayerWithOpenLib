@@ -9,6 +9,14 @@
  5. 两个命名空间 Orz(平台无关) Program(平台相关)
  6. 仅供学习交流
 
+###截图
+
+截图1
+![](https://github.com/endlesstravel/MusicPlayerWithOpenLib/blob/screenshot/screenshot01.png)
+
+截图2
+![](https://github.com/endlesstravel/MusicPlayerWithOpenLib/blob/screenshot/screenshot02.png)
+
 ###工作方式
 解释为资源型程序,并非自顶端往下一条线发展
 其中 三个部分 互相访问
