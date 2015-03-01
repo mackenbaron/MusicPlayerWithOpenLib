@@ -19,10 +19,12 @@ manage
 
 animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许直接访问
 
-###其他
-其实这个项目的名字不太符合它的内容.因为这是一个音乐播放器
-灵感源自哔哩哔哩的[这个视频](http://www.bilibili.com/video/av1750418)
+其中也受到了开源游戏引擎Ogre的影响,所有有点它的风格.
 
+###其他
+其实这个项目的名字,不太符合它的内容.因为这是一个音乐播放器.
+
+>灵感源自哔哩哔哩的[这个视频](http://www.bilibili.com/video/av1750418)
 >悄悄告诉你,这是用[StackEdit](https://stackedit.io/)在线编辑器写的 : )
 
 
