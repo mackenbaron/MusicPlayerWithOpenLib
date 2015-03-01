@@ -31,8 +31,13 @@ animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许�
 
 ##部署
 *获取源文件
+
 *获取附件 resource.zip, dll.zip
+
 *在项目中添加 源文件 sdl  libzplay 和 libiconv的头文件和链接库
+
 *编译
+
 *在目录下解压resource.zip, dll.zip
+
 *运行
