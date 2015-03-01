@@ -31,7 +31,7 @@ animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许�
 
 ###完成度
 
-从非编程人员的角度上看:
+- 从非编程人员的角度上看:
 - [ ] 和bilibili上一模一样
 - [ ] 具有和播放器一样的功能(除了网页模块)
       - [x] 进度条
@@ -39,7 +39,7 @@ animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许�
       - [ ] 玻璃网背景
       - [ ] 粒子效果
       - [ ] 3D三角形背景
-- [x] 背景一样
+- [x] 背景一样<br>
 
 
 - 从程序员的角度看:
