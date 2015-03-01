@@ -54,7 +54,7 @@ namespace Orz
 						SDL_WINDOWPOS_UNDEFINED,    // 窗口的X坐标
 						SDL_WINDOWPOS_UNDEFINED,    // 窗口的Y坐标
 						Width, Height,
-						SDL_WINDOW_SHOWN);//|SDL_WINDOW_FULLSCREEN //BORDERLESS);     // 调整为无边框窗口、全屏
+						NULL);//SDL_WINDOW_SHOWN);//|SDL_WINDOW_FULLSCREEN //BORDERLESS);     // 调整为无边框窗口、全屏
 
 
 		// 检测是否成功
@@ -86,6 +86,7 @@ namespace Orz
 
 		// 打开SDL的窗口拖拽打开文件功能
 		SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+
 
 		return true;
 	}

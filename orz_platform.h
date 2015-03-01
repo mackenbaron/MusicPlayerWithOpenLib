@@ -38,6 +38,15 @@ namespace Orz
 		// 获得要打开的文件
 		void GetPathOfFileThatRequireOpen(std::string &FilePath);
 
+		// 设置应用程序路径当前路径
+		bool SetCurrentPathOfThisProgramGBK(std::string &FilePath);
+
+		// 获取应用程序路径
+		bool GetPathOfThisProgramGBK(std::string &FilePath);
+
+		// 设置 DLL 文件路径
+		bool SetPathOfDLLGBK(std::string &FilePath);
+
     private:
 		// 要打开的文件
 		std::vector<std::string> drag_and_open_file_path_list;

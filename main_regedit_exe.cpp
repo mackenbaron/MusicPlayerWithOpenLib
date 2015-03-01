@@ -560,7 +560,6 @@ namespace Program
 			succeed = false;
 		}
 
-
 		// ¹Ø±Õ¼ü
 		RegCloseKey(new_key_command);
 		RegCloseKey(new_key_open);

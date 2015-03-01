@@ -2,6 +2,7 @@
 #include "orz_control.h"
 #include "main_play_list.h"
 #include "main_regedit_exe.h"
+#include "orz_option.h"
 
 #include <cmath>
 #include <iostream>
@@ -34,6 +35,25 @@ bool CreateScene()
 	GetDefaultOpenFileWay();
 	SetDefaultOpenFileWayToThisProgram();
 
+	std::string this_program_path;
+	platform.GetPathOfThisProgramGBK(this_program_path);
+
+	//// case 1
+	//// 加载 DLL 文件
+	//platform.SetPathOfDLLGBK(this_program_path);
+	//platform.SetCurrentPathOfThisProgramGBK(this_program_path);
+
+	// case 2
+	this_program_path.pop_back(); // 消去 Debug
+	this_program_path.pop_back();
+	this_program_path.pop_back();
+	this_program_path.pop_back();
+	this_program_path.pop_back();
+	this_program_path.append("Orz_VS_Project_alpha_02");// 加上 Orz_VS_Project_alpha_02
+	// 加载 DLL 文件
+	platform.SetPathOfDLLGBK(this_program_path);
+	platform.SetCurrentPathOfThisProgramGBK(this_program_path);
+
 	// 画面-------------------------------------------------------------
 	platform.CreateWindow("xxx", ScreenWidth, ScreenHeight);
 	manager.CreateAnimate("back", "resource\\background.orzanimate");
@@ -62,6 +82,7 @@ bool CreateScene()
 	int first_bar_w, first_bar_h;
 	manager.GetControlBar("first_bar").GetSize(first_bar_w, first_bar_h);
 	manager.GetControlBar("first_bar").ChangePosition((sw - first_bar_w)/2, (sh*1.02-first_bar_h) /2);
+
 
 
 	//SDL_Delay(5000);
@@ -124,12 +145,15 @@ bool CreateScene()
 
 void UpdateScene()
 {
-	/////////////// 打开文件
+	///////////// 打开文件
 	if (platform.IsHaveFileRequireOpen())
 	{
 		std::string path;
 		platform.GetPathOfFileThatRequireOpen(path);
 
+#ifdef CodeDebug
+		std::cout<<path.c_str()<<std::endl;
+#endif
 		device.sound.Load(path.c_str());
 		device.sound.Play();
 	}
@@ -307,8 +331,28 @@ void UpdateScene()
 	manager.GetWriter("version_text").Write();
 }
 
+bool CreateScene_test()
+{
+	// 系统函数 --------------------------------------------------------
+
+	GetDefaultOpenFileWay();
+	SetDefaultOpenFileWayToThisProgram();
+
+
+	std::string this_program_path;
+	platform.GetPathOfThisProgramGBK(this_program_path);
+
+	return true;
+}
+
+void UpdateScene_test()
+{
+	manager.QuitScene();
+}
+
 int SDL_main(int arg, char*[])
 {
+	//manager.Go(CreateScene_test, UpdateScene_test);
 	manager.Go(CreateScene, UpdateScene);
 
 	return 1;

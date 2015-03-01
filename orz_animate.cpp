@@ -255,6 +255,7 @@ namespace Orz
                 break;
             }
         }
+
         if(!image.CreateFromFile(var))
         {
             error_out("BaseTexture::LoadFromFile - ¥¥Ω®Œ∆¿Ì ß∞‹!");
