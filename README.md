@@ -12,10 +12,10 @@
 ###截图
 
 截图1
-![](https://github.com/endlesstravel/MusicPlayerWithOpenLib/blob/screenshot/screenshot01.png)
+![](https://raw.githubusercontent.com/endlesstravel/MusicPlayerWithOpenLib/screenshot/screenshot01.png)
 
 截图2
-![](https://github.com/endlesstravel/MusicPlayerWithOpenLib/blob/screenshot/screenshot02.png)
+![](https://raw.githubusercontent.com/endlesstravel/MusicPlayerWithOpenLib/screenshot/screenshot02.png)
 
 ###工作方式
 解释为资源型程序,并非自顶端往下一条线发展
