@@ -2,6 +2,7 @@
 #include "orz_option.h"
 #include "orz_base_zplay.h"
 #include "orz_base_time.h"
+#include "orz_base_text_convert.h"
 
 #include <iostream>
 using std::cout;
@@ -61,11 +62,31 @@ namespace Orz
 		else
 		{
 			// 获取文件 ID3 信息
-			if(player->LoadID3Ex(&id3, 1) == 0)
+			if(player->LoadID3Ex(&id3_gbk, 0) == 0) // 第二个参数 0 代表不解析图片
 			{
 				#ifdef CodeDebug
 					cout<<"BaseZPlay: 文件没有 ID3 信息"<<endl;
 				#endif // CodeDebug
+			}
+			else
+			{
+				// 手动转换
+				id3_utf8.Title					= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.Title		);
+				id3_utf8.Artist					= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.Artist		);	
+				id3_utf8.Album					= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.Album		);
+				id3_utf8.Year					= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.Year		);
+				id3_utf8.Comment				= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.Comment		);
+				id3_utf8.TrackNum				= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.TrackNum	);
+				id3_utf8.Genre					= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.Genre		);
+				id3_utf8.AlbumArtist			= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.AlbumArtist	);
+				id3_utf8.Composer				= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.Composer	);
+				id3_utf8.OriginalArtist			= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.OriginalArtist);
+				id3_utf8.Copyright				= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.Copyright	);
+				id3_utf8.URL					= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.URL			);
+				id3_utf8.Encoder				= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.Encoder		);
+				id3_utf8.Publisher				= ConvertTextFromeGBKToUTF8WithMemory(id3_gbk.Publisher	);
+
+				id3_utf8.BPM = id3_gbk.BPM;
 			}
 
 			// 获取流信息
@@ -150,9 +171,14 @@ namespace Orz
 		table.millisecond = position.hms.millisecond;
 	}
 
-	const TID3InfoEx& BaseZPlay::GetCurrMusicID3()
+	const TID3InfoEx& BaseZPlay::GetCurrMusicID3GBK()
 	{
-		return id3;
+		return id3_gbk;
+	}
+
+	const TID3InfoEx& BaseZPlay::GetCurrMusicID3UTF8()
+	{
+		return id3_utf8;
 	}
 
 	//void BaseZPlay::GetFFTDate(int **LeftData, int **RightData, int *Size)

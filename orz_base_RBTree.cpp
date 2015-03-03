@@ -4,21 +4,23 @@
 
 namespace Orz
 {
-	RBTree::RBTree():null(&soild_null), root(null)
+	RBTree::RBTree():null(&soild_null), root(null), size(0)
 	{
 		null->color = BLACK;
 	}
+	
 	RBTree::~RBTree()
 	{
 		Free();
 	}
+
 	// 打印操作
-	void RBTree::Print()
+	void RBTree::_Print()
 	{
-		Print(root, 0);
+		_Print(root, 0);
 	}
 
-	void RBTree::Print(RBTreeNode* node, int lay)
+	void RBTree::_Print(RBTreeNode* node, int lay)
 	{
 		using std::cout;
 		if(node!=null)
@@ -26,9 +28,9 @@ namespace Orz
 			cout<<"层数为"<<lay<<"的 "<<node<<" 节点的值为: "<<node->key<<"\n";
 
 			cout<<"层数为"<<lay<<"的 "<<node<<" 的左节点:\n";
-			Print(node->left, lay+1);
+			_Print(node->left, lay+1);
 			cout<<"层数为"<<lay<<"的 "<<node<<" 的右节点:\n";
-			Print(node->right, lay+1);
+			_Print(node->right, lay+1);
 		}
 		else
 			cout<<"层数为"<<lay<<"的 "<<node<<" 节点无数据\n"<<std::endl;
@@ -70,8 +72,8 @@ namespace Orz
     void RBTree::Free()
     {
 		delete Free(root);
+		size = 0;
     }
-
 
     // 寻找后继
     RBTreeNode* RBTree::Successor(RBTreeNode* x)
@@ -161,6 +163,8 @@ namespace Orz
         z->color = RED;
 
         InsertFixUp(z);
+
+		size++;
     }
 
     void RBTree::InsertFixUp(RBTreeNode* z)
@@ -267,6 +271,8 @@ namespace Orz
             if(y_original_color == BLACK)
                 DeleteFixUp(x);
         }
+
+		size--;
     }
     
 	void RBTree::DeleteFixUp(RBTreeNode* x)
@@ -342,18 +348,31 @@ namespace Orz
         x->color = BLACK;
     }
 
-
 	RBTreeNode* RBTree::Maxmum(RBTreeNode *x)
 	{
 		while(x->left != null)
 			x = x->left;
 		return x;
 	}
+
 	RBTreeNode* RBTree::Minmum(RBTreeNode *x)
 	{
 		while(x->right != null)
 			x = x->right;
 		return x;
+	}
+
+	bool RBTree::Empty()
+	{
+		if (size >= 0)
+			return false;
+
+		return true;
+	}
+
+	int RBTree::Size()
+	{
+		return size;
 	}
 
 }

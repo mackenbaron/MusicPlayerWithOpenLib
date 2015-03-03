@@ -8,7 +8,7 @@
 #define MAX_CHAR_PATH 1024
 namespace Program
 {
-	bool PlayList::LoadPlayList(const char *Path)
+	bool PlayList::LoadPlayListM3u(const char *Path)
 	{
 		bool succeed(true);
 		FILE *fp;
@@ -82,6 +82,41 @@ namespace Program
 	std::vector<SongInformation>& PlayList::GetSongList()
 	{
 		return song_list;
+	}
+
+	void PlayList::PushBackEntryGBK(const char *Path)
+	{
+		SongInformation temp_song_information;
+		int name_start_position = 0;
+
+		// 保存路径
+		temp_song_information.path_gbk = Path;
+
+		// 得到名字
+		int i = 0;
+		for (i = 0; Path[i]; i++)
+		{
+			if (Path[i] == '\\')
+			{
+				name_start_position = i + 1;
+			}
+		}
+
+		temp_song_information.name_gbk.clear();
+		temp_song_information.name_gbk.append(Path + name_start_position);
+
+		// 删去 .xxx 目前假定是4个
+		//temp_song_information.name.pop_back();
+		//temp_song_information.name.pop_back();
+		//temp_song_information.name.pop_back();
+		//temp_song_information.name.pop_back();
+		//temp_song_information.name.pop_back();
+
+		temp_song_information.name_utf8 = Orz::ConvertTextFromeGBKToUTF8(temp_song_information.name_gbk.c_str());
+		temp_song_information.path_utf8 = Orz::ConvertTextFromeGBKToUTF8(temp_song_information.path_gbk.c_str());
+
+		song_list.push_back(temp_song_information);
+		
 	}
 
 }

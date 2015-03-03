@@ -12,14 +12,17 @@ namespace Orz
 	// 转换的工作空间
 	extern char text_output_buffer[MAX_ARRAY];
 
-	// 转换 GBK 到 UTF8 返回一个字符串地址. 不是分配空间!!!
+	// 转换 GBK 到 UTF8 .返回一个字符串地址. 不是分配空间!!!
 	char* ConvertTextFromeGBKToUTF8(const char *text_gbk);
 
-	// 转换 GBK 到 UTF16 返回一个字符串地址. 不是分配空间!!!
+	// 转换 GBK 到 UTF16 .返回一个字符串地址. 不是分配空间!!!
 	char* ConvertTextFromeGBKToUTF16(const char *text_gbk);
 
-	// 转换 UTF8 到 GBK 返回一个字符串地址. 不是分配空间!!!
+	// 转换 UTF8 到 GBK .返回一个字符串地址. 不是分配空间!!!
 	char* ConvertTextFromeUTF8oGBKT(const char *text_utf8);
+
+	// 转换 GBK 到 UTF8 .返回一个字符串地址. 分配空间!!!记住删除
+	char* ConvertTextFromeGBKToUTF8WithMemory(const char *text_gbk);
 }
 
 

@@ -78,6 +78,7 @@ bool CreateScene()
 	manager.CreateControlList("first_list", "resource\\first_list.orzcontrol", sw*(0.0/1280.), sh*(100./720.));
 
 	manager.GetControlList("first_list").GetControlBar().ChangeAlpha(254);
+
 	// 获取数据,调整位置
 	int first_bar_w, first_bar_h;
 	manager.GetControlBar("first_bar").GetSize(first_bar_w, first_bar_h);
@@ -88,7 +89,7 @@ bool CreateScene()
 	//SDL_Delay(5000);
 
 	// 读取播放列表-------------------------------------------------------
-	play_list.LoadPlayList("resource\\playlist.m3u");
+	play_list.LoadPlayListM3u("resource\\playlist.m3u");
 
 	for (int i = 0; i < play_list.GetSongList().size(); ++i)
 	{
@@ -154,10 +155,18 @@ void UpdateScene()
 #ifdef CodeDebug
 		std::cout<<path.c_str()<<std::endl;
 #endif
-		device.sound.Load(path.c_str());
-		device.sound.Play();
+		play_list.PushBackEntryGBK(path.c_str());
+
+		manager.GetControlList("first_list").PushBack(play_list.GetSongList().back().path_utf8.c_str(), play_list.GetSongList().back().name_utf8.c_str());
+
+
+		if (device.sound.Load(path.c_str()))
+		{
+			device.sound.Play();
+			manager.GetWriter("artist_text").ChangeText(device.sound.GetCurrMusicID3UTF8().Artist);
+			manager.GetWriter("title_text").ChangeText(device.sound.GetCurrMusicID3UTF8().Title);
+		}
 	}
-	
 
 	////////////////////////////////////
 
@@ -262,11 +271,11 @@ void UpdateScene()
 	manager.GetWriter("small_text").Write();
 
 	sprintf(time_number_text, "%02d:%02d",elapsed_time_table.minute, elapsed_time_table.second);
-	//manager.GetWriter("elapsed_text").ChangeText(time_number_text).Write();
+	manager.GetWriter("elapsed_text").ChangeText(time_number_text).Write();
 
 	remained_time_table.SetTimeBySecond(total_time_table.GetTotalTimeBySecond() - elapsed_time_table.GetTotalTimeBySecond());
 	sprintf(time_number_text, "%02d:%02d",remained_time_table.minute, remained_time_table.second);
-	//manager.GetWriter("remained_text").ChangeText(time_number_text).Write();
+	manager.GetWriter("remained_text").ChangeText(time_number_text).Write();
 
 
 	// 按钮x---------------------------------------------------------------------------------
@@ -308,8 +317,8 @@ void UpdateScene()
 					if (p_play_list[i].path_utf8 == manager.GetControlList("first_list").GetControlTextThatHaveMessage()->GetName())
 					{
 						device.sound.Load(p_play_list[i].path_gbk.c_str());
-						manager.GetWriter("title_text").ChangeText(ConvertTextFromeGBKToUTF8(device.sound.GetCurrMusicID3().Title));
-						manager.GetWriter("artist_text").ChangeText(ConvertTextFromeGBKToUTF8(device.sound.GetCurrMusicID3().Artist));
+						manager.GetWriter("title_text").ChangeText(ConvertTextFromeGBKToUTF8(device.sound.GetCurrMusicID3GBK().Title));
+						manager.GetWriter("artist_text").ChangeText(ConvertTextFromeGBKToUTF8(device.sound.GetCurrMusicID3GBK().Artist));
 						device.sound.Play();
 					}
 					

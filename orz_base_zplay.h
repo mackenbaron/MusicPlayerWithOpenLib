@@ -44,7 +44,8 @@ namespace Orz
 		void GetCurrTime(MusicTimeTable &table);
 
 		// 获取当前文件 ID3 信息
-		const TID3InfoEx& GetCurrMusicID3();
+		const TID3InfoEx& GetCurrMusicID3GBK();
+		const TID3InfoEx& GetCurrMusicID3UTF8();
 
 		// 获取 FFT 数据
 		void GetFFTDate(int **Data, int **DataTop, int *Size);
@@ -66,7 +67,8 @@ namespace Orz
         TStreamTime position;
 
         // 文件 ID3 信息
-        TID3InfoEx id3;
+		TID3InfoEx id3_gbk;
+		TID3InfoEx id3_utf8;
 
         // 歌曲信息
         TStreamInfo info;

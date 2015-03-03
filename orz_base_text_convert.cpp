@@ -102,4 +102,14 @@ namespace Orz
 
 		return text_output_buffer;
 	}
+
+	char* ConvertTextFromeGBKToUTF8WithMemory(const char *text_gbk)
+	{
+		char *temp_text = ConvertTextFromeGBKToUTF8(text_gbk);
+		int size = strlen(temp_text) + 1;
+		char *return_text = new char[size];
+		strcpy(return_text, temp_text);
+		return return_text;
+	}
+
 }
