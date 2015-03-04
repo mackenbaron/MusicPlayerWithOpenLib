@@ -2,7 +2,6 @@
 #include "orz_control.h"
 #include "main_play_list.h"
 #include "main_regedit_exe.h"
-#include "orz_option.h"
 
 #include <cmath>
 #include <iostream>
@@ -43,16 +42,16 @@ bool CreateScene()
 	//platform.SetPathOfDLLGBK(this_program_path);
 	//platform.SetCurrentPathOfThisProgramGBK(this_program_path);
 
-	// case 2
-	this_program_path.pop_back(); // 消去 Debug
-	this_program_path.pop_back();
-	this_program_path.pop_back();
-	this_program_path.pop_back();
-	this_program_path.pop_back();
-	this_program_path.append("Orz_VS_Project_alpha_02");// 加上 Orz_VS_Project_alpha_02
-	// 加载 DLL 文件
-	platform.SetPathOfDLLGBK(this_program_path);
-	platform.SetCurrentPathOfThisProgramGBK(this_program_path);
+	//// case 2
+	//this_program_path.pop_back(); // 消去 Debug
+	//this_program_path.pop_back();
+	//this_program_path.pop_back();
+	//this_program_path.pop_back();
+	//this_program_path.pop_back();
+	//this_program_path.append("Orz_VS_Project_alpha_02");// 加上 Orz_VS_Project_alpha_02
+	//// 加载 DLL 文件
+	//platform.SetPathOfDLLGBK(this_program_path);
+	//platform.SetCurrentPathOfThisProgramGBK(this_program_path);
 
 	// 画面-------------------------------------------------------------
 	platform.CreateWindow("xxx", ScreenWidth, ScreenHeight);
@@ -83,7 +82,6 @@ bool CreateScene()
 	int first_bar_w, first_bar_h;
 	manager.GetControlBar("first_bar").GetSize(first_bar_w, first_bar_h);
 	manager.GetControlBar("first_bar").ChangePosition((sw - first_bar_w)/2, (sh*1.02-first_bar_h) /2);
-
 
 
 	//SDL_Delay(5000);
@@ -146,6 +144,7 @@ bool CreateScene()
 
 void UpdateScene()
 {
+
 	///////////// 打开文件
 	if (platform.IsHaveFileRequireOpen())
 	{
@@ -188,8 +187,8 @@ void UpdateScene()
 	// 滚动条---------------------------------------------------------------------------------
 
 	// 滑动条定位
-	manager.GetControlBar("first_bar").Contact(mx, my, device.GetButton(KEY_MOUSE_LEFT));
-	if (manager.GetControlBar("first_bar").GetMessage() == MOUSE_CLICK||manager.GetControlBar("first_bar").GetMessage() == MOUSE_CONST_DOWN_END)
+	manager.GetControlBar("first_bar").Contact(mx, my, device.input.GetButton(KEY_MOUSE_LEFT));
+	if (manager.GetControlBar("first_bar").GetMessage() == CONTROL_MESSAGE_MOUSE_CLICK||manager.GetControlBar("first_bar").GetMessage() == CONTROL_MESSAGE_MOUSE_CONST_DOWN_END)
 	{
 		manager.GetControlBar("first_bar").ChangePercent(mx, my);
 		device.sound.SetTimeBySecond(total_time_table.GetTotalTimeBySecond()*manager.GetControlBar("first_bar").GetPercent());
@@ -227,8 +226,8 @@ void UpdateScene()
 
 		int real_high = FFT_data[real_m] + distance;
 
-		device.DrawLine(color_red, i*2 + 50, 500, i*2 + 50, 500 - real_high);
-		device.DrawPoint(color_bule, i*2 + 50, 500 - FFT_top_data[real_m]);
+		device.display.DrawLine(color_red, i*2 + 50, 500, i*2 + 50, 500 - real_high);
+		device.display.DrawPoint(color_bule, i*2 + 50, 500 - FFT_top_data[real_m]);
 	}
 
 	// 画圆
@@ -247,7 +246,7 @@ void UpdateScene()
 			1.0,
 			(FFT_data[(int)(degree/360.0*number_of_FFT_data)] / (float)device.sound.GetFFTMax() + 0.07)*1.,
 			degree,
-			&draw_center
+			draw_center
 			);
 	}
 
@@ -261,7 +260,7 @@ void UpdateScene()
 			(FFT_data[(int)(degree/360.0*number_of_FFT_data)] / (float)device.sound.GetFFTMax() + 0.07)*1.,
 			-degree,
 			//0.,
-			&draw_center
+			draw_center
 			);
 	}
 
@@ -280,11 +279,11 @@ void UpdateScene()
 
 	// 按钮x---------------------------------------------------------------------------------
 	manager.GetControlButton("first_button").Show();
-	if (my == 0 || manager.GetControlButton("first_button").GetMessage() == MOUSE_OVER)
+	if (my == 0 || manager.GetControlButton("first_button").GetMessage() == CONTROL_MESSAGE_MOUSE_OVER)
 	{
-		manager.GetControlButton("first_button").Contact(mx, my, device.GetButton(KEY_MOUSE_LEFT));
+		manager.GetControlButton("first_button").Contact(mx, my, device.input.GetButton(KEY_MOUSE_LEFT));
 		
-		if (manager.GetControlButton("first_button").GetMessage() == MOUSE_CLICK)
+		if (manager.GetControlButton("first_button").GetMessage() == CONTROL_MESSAGE_MOUSE_CLICK)
 		{
 			manager.QuitScene();
 		}
@@ -298,15 +297,15 @@ void UpdateScene()
 	
 	// 列表控件------------------------------------------------------------------------------
 	manager.GetControlList("first_list").Show();
-	if (mx==0||manager.GetControlList("first_list").GetState() == CONTROL_MOUSE_OVER||manager.GetControlList("first_list").GetState() == CONTROL_MOUSE_DOWN)
+	if (mx==0||manager.GetControlList("first_list").GetState() == CONTROL_STATE_MOUSE_OVER||manager.GetControlList("first_list").GetState() == CONTROL_STATE_MOUSE_DOWN)
 	{
-		manager.GetControlList("first_list").Contact(mx, my, device.GetButton(KEY_MOUSE_LEFT));
-		if (device.GetMouseWheel())
-			manager.GetControlList("first_list").ChangePercent(manager.GetControlList("first_list").GetPercent()-0.1*device.GetMouseWheel());
+		manager.GetControlList("first_list").Contact(mx, my, device.input.GetButton(KEY_MOUSE_LEFT));
+		if (device.input.GetMouseWheel())
+			manager.GetControlList("first_list").ChangePercent(manager.GetControlList("first_list").GetPercent()-0.1*device.input.GetMouseWheel());
 
 		if (manager.GetControlList("first_list").IsAnyControlTextHaveMessage())
 		{
-			if (manager.GetControlList("first_list").GetControlTextThatHaveMessage()->GetMessage() == MOUSE_DOUBLE_CLICK)
+			if (manager.GetControlList("first_list").GetControlTextThatHaveMessage()->GetMessage() == CONTROL_MESSAGE_MOUSE_DOUBLE_CLICK)
 			{
 				manager.GetControlList("first_list").GetControlTextThatHaveMessage()->ChangeAlpha(120);
 

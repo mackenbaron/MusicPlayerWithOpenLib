@@ -1,31 +1,32 @@
 
 #include "orz_platform.h"
 #include "orz_base_public_resource.h"
+#include "orz_base_private_resource.h"
 
 #include <Windows.h>
 #undef CreateWindow
 
 namespace Orz
 {
-	bool Platform::Init()
+	bool _Platform::Init()
 	{
 		return true;
 	}
 
-	bool Platform::CreateWindow(const std::string &WindowName, int Width, int Height)
+	bool _Platform::CreateWindow(const std::string &WindowName, int Width, int Height)
 	{
-		return sdl.CreateWindow(WindowName, Width, Height);
+		return device.display.CreateWindow(WindowName, Width, Height);
 	}
 
-	bool Platform::CreateFullscreenWindow(const std::string &WindowName, int Width, int Height)
+	bool _Platform::CreateFullscreenWindow(const std::string &WindowName, int Width, int Height)
 	{
-		return sdl.CreateFullscreenWindow(WindowName, Width, Height);
+		return device.display.CreateFullscreenWindow(WindowName, Width, Height);
 	}
 
-	void Platform::DealSystemMessage(SDL_Event &event)
+	void _Platform::DealSystemMessage(SDL_Event &event)
 	{
 		// 消灭事件
-		device.ContactWheel(0);
+		device.input.ContactWheel(0);
 
 		// 激活事件
 		while(SDL_PollEvent(&event))
@@ -47,19 +48,19 @@ namespace Orz
 			case SDL_MOUSEBUTTONDOWN:
 				{
 					if(event.button.button == SDL_BUTTON_LEFT)
-						device.Contact(KEY_MOUSE_LEFT, true);
+						device.input.Contact(KEY_MOUSE_LEFT, true);
 
 				}break;
 
 			case SDL_MOUSEBUTTONUP:
 				{
 					if(event.button.button == SDL_BUTTON_LEFT)
-						device.Contact(KEY_MOUSE_LEFT, false);
+						device.input.Contact(KEY_MOUSE_LEFT, false);
 				}break;
 
 			case SDL_MOUSEWHEEL:
 				{
-					device.ContactWheel(event.wheel.y);
+					device.input.ContactWheel(event.wheel.y);
 				}break;
 
 			case SDL_DROPFILE:
@@ -79,17 +80,17 @@ namespace Orz
 		}
 	}
 
-	void Platform::GetMousePosition(int &x, int &y)
+	void _Platform::GetMousePosition(int &x, int &y)
 	{
 		SDL_GetMouseState(&x, &y);
 	}
 
-	void Platform::GetWindowSize(int &w, int &h)
+	void _Platform::GetWindowSize(int &w, int &h)
 	{
-		SDL_GetWindowSize(sdl.window, &w, &h);
+		SDL_GetWindowSize(device.display.window, &w, &h);
 	}
 
-	bool Platform::IsHaveFileRequireOpen()
+	bool _Platform::IsHaveFileRequireOpen()
 	{
 		if (drag_and_open_file_path_list.empty())
 			return false;
@@ -97,12 +98,12 @@ namespace Orz
 		return true;
 	}
 
-	int Platform::NumberOfFilePathThatRequireOpen()
+	int _Platform::NumberOfFilePathThatRequireOpen()
 	{
 		return drag_and_open_file_path_list.size();
 	}
 
-	void Platform::GetPathOfFileThatRequireOpen(std::string &FilePath)
+	void _Platform::GetPathOfFileThatRequireOpen(std::string &FilePath)
 	{
 		if (drag_and_open_file_path_list.empty())
 			return;
@@ -111,7 +112,7 @@ namespace Orz
 		drag_and_open_file_path_list.pop_back();
 	}
 
-	bool Platform::SetCurrentPathOfThisProgramGBK(std::string &FilePath)
+	bool _Platform::SetCurrentPathOfThisProgramGBK(std::string &FilePath)
 	{
 		// 函数调用成功返回非 0 值
 		if (SetCurrentDirectoryA(FilePath.c_str()) == 0)
@@ -124,7 +125,7 @@ namespace Orz
 		return true;
 	}
 
-	bool Platform::GetPathOfThisProgramGBK(std::string &FilePath)
+	bool _Platform::GetPathOfThisProgramGBK(std::string &FilePath)
 	{
 		// 获取此程序的文件路径
 		bool succeed(true);
@@ -160,7 +161,7 @@ namespace Orz
 		return succeed;
 	}
 
-	bool Platform::SetPathOfDLLGBK(std::string &FilePath)
+	bool _Platform::SetPathOfDLLGBK(std::string &FilePath)
 	{
 		// 函数调用成功返回非 0 值
 		if (SetDllDirectoryA(FilePath.c_str()) == 0)

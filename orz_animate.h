@@ -39,8 +39,8 @@ namespace Orz
 		void Draw(Rect &dest_rect);
 		void DrawFill(Rect &DestRect);
         void Draw(int x, int y, float scale = 1.0);
-		void DrawEx(int x, int y, float scale = 1.0, float angle = .0 ,Point *center = NULL, FlipMod flip_mod = FLIP_NONE);
-		void DrawEx(int x, int y, float width_scale, float height_scale, float angle, Point *center);
+		void DrawEx(int x, int y, float scale,  float angle, Point &center,FlipMod flip_mod = FLIP_NONE);
+		void DrawEx(int x, int y, float width_scale, float height_scale, float angle, Point& center);
 
 
     private:

@@ -3,7 +3,6 @@
 
 #include <SDL_image.h>
 #include "orz_log.h"
-#include "orz_option.h"
 #include "orz_base_public_resource.h"
 
 namespace Orz
@@ -46,7 +45,7 @@ namespace Orz
 		else
 		{
 			//Create texture from surface pixels
-			newTexture = SDL_CreateTextureFromSurface( sdl.render, loadedSurface );
+			newTexture = SDL_CreateTextureFromSurface( device.display.render, loadedSurface );
 			if( newTexture == NULL )
 			{
 				std::string err = "无法从\""+path+"\"创建纹理! ";
@@ -103,7 +102,7 @@ namespace Orz
 			//}
 
 			//Create texture from surface pixels
-			mTexture = SDL_CreateTextureFromSurface( sdl.render, textSurface );
+			mTexture = SDL_CreateTextureFromSurface( device.display.render, textSurface );
 
 			if( mTexture == NULL )
 			{
@@ -129,7 +128,7 @@ namespace Orz
 		//Free();
 
 		//Create uninitialized texture
-		mTexture = SDL_CreateTexture( sdl.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height );
+		mTexture = SDL_CreateTexture( device.display.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height );
 		if( mTexture == NULL )
 		{
 			printf( "Unable to create blank texture! SDL Error: %s\n", SDL_GetError() );
@@ -148,7 +147,7 @@ namespace Orz
 		Free();
 
 		//Create uninitialized texture
-		mTexture = SDL_CreateTexture( sdl.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height );
+		mTexture = SDL_CreateTexture( device.display.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height );
 		if( mTexture == NULL )
 		{
 			printf( "Unable to create blank texture! SDL Error: %s\n", SDL_GetError() );
@@ -167,7 +166,7 @@ namespace Orz
 		Free();
 
 		//Create uninitialized texture
-		mTexture = SDL_CreateTexture( sdl.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, width, height );
+		mTexture = SDL_CreateTexture( device.display.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, width, height );
 		if( mTexture == NULL )
 		{
 			printf( "Unable to create blank texture! SDL Error: %s\n", SDL_GetError() );
@@ -231,7 +230,7 @@ namespace Orz
 	{
 		if (mTexture)
 		{
-			if(SDL_SetRenderTarget(sdl.render, mTexture) != 0)
+			if(SDL_SetRenderTarget(device.display.render, mTexture) != 0)
 			{
 				long address;
 				char buff[16];
@@ -248,7 +247,7 @@ namespace Orz
 		SDL_Rect td = {X,Y,mWidth, mHeight};
 
 		//Render to screen
-		SDL_RenderCopy( sdl.render, mTexture, &ts, &td);
+		SDL_RenderCopy( device.display.render, mTexture, &ts, &td);
 	}
 
 	void BaseTexture::Draw(int X, int Y, float Rate)
@@ -257,7 +256,7 @@ namespace Orz
 		SDL_Rect td = {X,Y,mWidth*Rate, mHeight*Rate};
 
 		//Render to screen
-		SDL_RenderCopy( sdl.render, mTexture, &ts, &td);
+		SDL_RenderCopy( device.display.render, mTexture, &ts, &td);
 	}
 
 
@@ -270,6 +269,19 @@ namespace Orz
 	{
 		source.MoveControlRightTo(this);
 		return *this;
+	}
+
+	void BaseTexture::Render(const SDL_Rect& SourceRect, const SDL_Rect& DestRect)
+	{
+		SDL_RenderCopy(device.display.render, mTexture,
+			&SourceRect, &DestRect);
+	}
+
+	void BaseTexture::RenderEx(const SDL_Rect& SourceRect, const SDL_Rect& DestRect, const double Angle, SDL_Point& Center, SDL_RendererFlip FlipMod)
+	{
+		SDL_RenderCopyEx(device.display.render, mTexture,
+			&SourceRect, &DestRect,
+			Angle, &Center, FlipMod);
 	}
 
 }

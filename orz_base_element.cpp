@@ -1,16 +1,11 @@
 
-#include "orz_base_control.h"
-#include "orz_config.h"
-
-#ifdef CodeDebug
-#include <iostream>
-#endif
+#include "orz_base_element.h"
 
 namespace Orz
 {
-	BaseControl::BaseControl(int X, int Y, int Width, int Height, ControlBackgroundStyle BackgroundStyle):
+	BaseElement::BaseElement(int X, int Y, int Width, int Height):
 	x(X), y(Y), width(Width), height(Height),
-	background_style(BackgroundStyle), is_show(true),
+	is_show(true),
 	last_down_time(0), last_up_time(0),
 	is_last_down(0),
 	in_judge_click(0), in_judge_double_click(0), in_judge_const_down(0)
@@ -18,12 +13,12 @@ namespace Orz
 
 	}
 
-	BaseControl::~BaseControl()
+	BaseElement::~BaseElement()
 	{
 
 	}
 
-	BaseControl& BaseControl::Contact(int MouseX, int MouseY, bool IsMouseDown)
+	BaseElement& BaseElement::Contact(int MouseX, int MouseY, bool IsMouseDown)
 	{
 		curr_time = SDL_GetTicks();
 		if(IsMouseOver(MouseX, MouseY)) // 鼠标在控件之内
@@ -246,100 +241,100 @@ namespace Orz
 			}
 		}
 
-#ifdef CodeDebug
+	#ifdef CodeDebug
 		using namespace std;
 		switch(control_message)
 		{
-		case CONTROL_MESSAGE_MOUSE_OVER:
-		case CONTROL_MESSAGE_MOUSE_OUT:
+		case ELEMENT_MESSAGE_MOUSE_OVER:
+		case ELEMENT_MESSAGE_MOUSE_OUT:
 		case ELEMENT_MESSAGE_FUNCTION_ERROR:break;
 
-		case CONTROL_MESSAGE_MOUSE_CONST_DOWN:
+		case ELEMENT_MESSAGE_MOUSE_CONST_DOWN:
 			cout<<control_name<<":MOUSE_CONST_DOWN"<<endl;
 			break;
-		case CONTROL_MESSAGE_MOUSE_CONST_DOWN_END:
+		case ELEMENT_MESSAGE_MOUSE_CONST_DOWN_END:
 			cout<<control_name<<":MOUSE_CONST_DOWN_END"<<endl;
 			break;
-		case CONTROL_MESSAGE_MOUSE_CLICK:
+		case ELEMENT_MESSAGE_MOUSE_CLICK:
 			cout<<control_name<<":MOUSE_CLICK"<<endl;
 			break;
-		case CONTROL_MESSAGE_MOUSE_DOUBLE_CLICK:
+		case ELEMENT_MESSAGE_MOUSE_DOUBLE_CLICK:
 			cout<<control_name<<":MOUSE_DOUBLE_CLICK"<<endl;
 			break;
 		}
-#endif
+	#endif
 		return *this;
 	}
 
-	BaseControl& BaseControl::ChangePosition(int X, int Y)
+	BaseElement& BaseElement::ChangePosition(int X, int Y)
 	{
 		x = X;
 		y = Y;
 		return *this;
 	}
 
-	BaseControl& BaseControl::ChangeSize(int Width, int Height)
+	BaseElement& BaseElement::ChangeSize(int Width, int Height)
 	{
 		width = Width;
 		height = Height;
 		return *this;
 	}
 
-	void BaseControl::Show()
+	void BaseElement::Show()
 	{
 		is_show = true;
 	}
 
-	void BaseControl::Hide()
+	void BaseElement::Hide()
 	{
 		is_show = false;
 	}
 
-	const char* BaseControl::GetName()
+	const std::string& BaseElement::GetName()
 	{
-		return control_name.c_str();
+		return control_name;
 	}
 
-	BaseControl& BaseControl::GetPosition(int &X, int &Y)
+	BaseElement& BaseElement::GetPosition(int &X, int &Y)
 	{
 		X = this->x;
 		Y = this->y;
 		return *this;
 	}
 
-	BaseControl& BaseControl::GetSize(int &Width, int &Height)
+	BaseElement& BaseElement::GetSize(int &Width, int &Height)
 	{
 		Width = this->width;
 		Height = this->height;
 		return *this;
 	}
 
-	int BaseControl::GetSizeWidth()
+	int BaseElement::GetSizeWidth()
 	{
 		return width;
 	}
 
-	int BaseControl::GetSizeHeight()
+	int BaseElement::GetSizeHeight()
 	{
 		return height;
 	}
 
-	bool BaseControl::IsShow()
+	bool BaseElement::IsShow()
 	{
 		return is_show;
 	}
 
-	ControlMessage BaseControl::GetMessage(void)
+	ControlMessage BaseElement::GetMessage(void)
 	{
 		return control_message;
 	}
 
-	ControlState BaseControl::GetState(void)
+	ControlState BaseElement::GetState(void)
 	{
 		return control_state;
 	}
 
-	bool BaseControl::IsMouseOver(int MouseX, int MouseY)
+	bool BaseElement::IsMouseOver(int MouseX, int MouseY)
 	{
 		if((x <= MouseX) && (MouseX <= x + width) && (y <= MouseY) && (MouseY <= y + height))
 			return true;
@@ -347,12 +342,12 @@ namespace Orz
 			return false;
 	}
 
-	void BaseControl::Draw(void)
+	void BaseElement::Draw(void)
 	{
 
 	}
 
-	void BaseControl::DrawFill(void)
+	void BaseElement::DrawFill(void)
 	{
 
 	}

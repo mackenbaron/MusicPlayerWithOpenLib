@@ -17,6 +17,8 @@ namespace Orz
     class BaseZPlay
     {
 	private:
+		friend class _Device;
+
         // ≥ı ºªØ libZPlay
         bool Init();
 

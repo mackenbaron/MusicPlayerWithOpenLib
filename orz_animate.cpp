@@ -2,7 +2,6 @@
 #include "orz_animate.h"
 #include "orz_base_time.h"
 #include "orz_log.h"
-#include "orz_option.h"
 #include "orz_base_public_resource.h"
 
 namespace Orz
@@ -55,7 +54,7 @@ namespace Orz
         dest_rect.w = scale * width;
         dest_rect.h = scale * height;
 
-        SDL_RenderCopy(sdl.render, image.GetTexture(), &source_rect, &dest_rect);
+		image.Render(source_rect, dest_rect);
     }
 
 	void Animate::Draw(Rect &DestRect)
@@ -86,11 +85,10 @@ namespace Orz
 		source_rect.w = width;
 		source_rect.h = height;
 
-		SDL_RenderCopy(sdl.render, image.GetTexture(), &source_rect, &dest_rect);
+		image.Render(source_rect, dest_rect);
 
 		#ifdef CodeDebug
-			SDL_SetRenderDrawColor(sdl.render, 255, 10, 20, 0xFF );		
-			SDL_RenderDrawRect(sdl.render, &DestRect);
+			device.display.DrawOutlineRect(RedColor, DestRect);
 		#endif
 	}
 
@@ -153,16 +151,14 @@ namespace Orz
 			source_rect.y += (height - DestRect.h * scale) * 0.5;
 		}
 
-
-		SDL_RenderCopy(sdl.render, image.GetTexture(), &source_rect, &DestRect);
+		image.Render(source_rect, DestRect);
 
 		#ifdef CodeDebug
-		SDL_SetRenderDrawColor(sdl.render, 255, 10, 20, 0xFF );		
-		SDL_RenderDrawRect(sdl.render, &DestRect);
+			device.display.DrawOutlineRect(RedColor, DestRect);
 		#endif
 	}
 
-    void Animate::DrawEx(int x, int y, float scale, float angle, Point *center, FlipMod flip_mod)
+    void Animate::DrawEx(int x, int y, float scale, float angle, Point &center, FlipMod flip_mod)
     {
         curr_frame = total_frame * ((curr_time - begin_time) % total_time) / total_time;
 
@@ -176,16 +172,10 @@ namespace Orz
         dest_rect.w = scale * width;
         dest_rect.h = scale * height;
 
-        if(center)
-            SDL_RenderCopyEx(sdl.render, image.GetTexture(), &source_rect, &dest_rect, angle, center, (SDL_RendererFlip)flip_mod);
-        else
-        {
-            Point temp_center = {width/2, height/2};
-            SDL_RenderCopyEx(sdl.render, image.GetTexture(), &source_rect, &dest_rect, angle, &temp_center, (SDL_RendererFlip)flip_mod);
-        }
+		image.RenderEx(source_rect, dest_rect, angle, center, (SDL_RendererFlip)flip_mod);
     }
 
-	void Animate::DrawEx(int x, int y, float width_scale, float height_scale, float angle, Point *center)
+	void Animate::DrawEx(int x, int y, float width_scale, float height_scale, float angle, Point& center)
 	{
 		curr_frame = total_frame * ((curr_time - begin_time) % total_time) / total_time;
 
@@ -199,8 +189,7 @@ namespace Orz
 		dest_rect.w = width_scale * width;
 		dest_rect.h = height_scale * height;
 
-		SDL_RenderCopyEx(sdl.render, image.GetTexture(), &source_rect, &dest_rect, angle, center, SDL_FLIP_NONE);
-
+		image.RenderEx(source_rect, dest_rect, angle, center, SDL_FLIP_NONE);
 	}
 
     bool Animate::LoadAnimate(const char* NamePath)

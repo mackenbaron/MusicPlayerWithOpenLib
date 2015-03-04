@@ -2,7 +2,6 @@
 
 #include "orz_writer.h"
 #include "orz_log.h"
-#include "orz_option.h"
 #include "orz_base_public_resource.h"
 
 namespace Orz
@@ -406,8 +405,7 @@ namespace Orz
 
 		#ifdef CodeDebug
 			// 画出线条来 文本外边框
-			SDL_SetRenderDrawColor( sdl.render, 0xFF, 0xF, 0x0, 0xF0 );
-			SDL_RenderDrawRect( sdl.render, &dest_rect );
+			device.display.DrawOutlineRect(RedColor, dest_rect);
 		#endif
     }
 
@@ -425,10 +423,9 @@ namespace Orz
 		}
 
 		#ifdef CodeDebug
-		// 画出线条来 文本外边框
-		Rect outline_rect = {X, Y,dest_rect.w , dest_rect.h};
-		SDL_SetRenderDrawColor( sdl.render, 0xFF, 0xF, 0x0, 0xF0 );
-		SDL_RenderDrawRect( sdl.render, &outline_rect );
+			// 画出线条来 文本外边框
+			Rect outline_rect = {X, Y,dest_rect.w , dest_rect.h};
+			device.display.DrawOutlineRect(RedColor, outline_rect);
 		#endif
 	}
 

@@ -1,5 +1,5 @@
 
-#include "orz_option.h"
+#include "orz_config.h"
 #include "orz_base_zplay.h"
 #include "orz_base_time.h"
 #include "orz_base_text_convert.h"

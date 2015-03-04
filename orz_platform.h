@@ -7,11 +7,10 @@
 
 namespace Orz
 {
-    class Platform
+    class _Platform
     {
 	private:
-		friend class Management;
-		friend class Root;
+		friend class _Manager;
 
 		// 平台初始化
         bool Init();

@@ -49,6 +49,8 @@ namespace Orz
 	// 创建窗口
 	bool BaseSDL::CreateWindow(const std::string &WindowName, int Width, int Height)
 	{
+		bool succeed(true);
+
 		// 创建窗口
 		window = SDL_CreateWindow(WindowName.c_str(),
 						SDL_WINDOWPOS_UNDEFINED,    // 窗口的X坐标
@@ -61,39 +63,19 @@ namespace Orz
 		if(window == NULL)
 		{
 			error_out("BaseSDL::CreateWindow - 创建窗口失败!");
-			return false;
+			succeed =  false;
 		}
 
-		// 初始化渲染器
-		render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+		succeed = DoTheThingsAfterCreateWindow();
 
-		// 创建绘制工具用的纹理
-		solid_color_texture.CreateTargetTexture(SOLID_TEXTURE_SIZE, SOLID_TEXTURE_SIZE);
-		solid_color_texture.SetBlendMode(SDL_BLENDMODE_BLEND);
-
-		// 初始化渲染器颜色
-		SDL_SetRenderDrawColor(render, 0XFF, 0XF, 0XF, 0XFF);
-
-		// 初始化SDL图片支持
-		IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
-
-		// 初始化TTF
-		if(TTF_Init() == -1)
-		{
-			error_out("初始化 TTF_Init 失败!");
-			return false;
-		}
-
-		// 打开SDL的窗口拖拽打开文件功能
-		SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
-
-
-		return true;
+		return succeed;
 	}
 
 	// 创建窗口
 	bool BaseSDL::CreateFullscreenWindow(const std::string &WindowName, int Width, int Height)
 	{
+		bool succeed(true);
+
 		// 创建窗口
 		window = SDL_CreateWindow(WindowName.c_str(),
 						SDL_WINDOWPOS_UNDEFINED,    // 窗口的X坐标
@@ -106,46 +88,26 @@ namespace Orz
 		if(window == NULL)
 		{
 			error_out("BaseSDL::CreateFullscreenWindow - 创建窗口失败!");
-			return false;
+			succeed = false;
 		}
 
-		// 初始化渲染器
-		render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+		succeed = DoTheThingsAfterCreateWindow();
 
-		// 初始化渲染器颜色
-		SDL_SetRenderDrawColor(render, 0XFF, 0XF, 0XF, 0XFF);
-
-		// 创建绘制工具用的纹理
-		solid_color_texture.CreateTargetTexture(SOLID_TEXTURE_SIZE, SOLID_TEXTURE_SIZE);
-		solid_color_texture.SetBlendMode(SDL_BLENDMODE_BLEND);
-
-		// 初始化SDL图片支持
-		IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
-
-		// 初始化TTF
-		if(TTF_Init() == -1)
-		{
-			error_out("初始化 TTF_Init 失败!");
-			return false;
-		}
-
-		// 打开SDL的窗口拖拽打开文件功能
-		SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
-
-		return true;
+		return succeed;
 	}
-
 
 	void BaseSDL::ClearRender()
 	{
 		SDL_SetRenderDrawColor(render, 0xF1, 0x5A, 0x22, 0xFF );
 		SDL_RenderClear(render);
 	}
+
 	void BaseSDL::ClearRender(const SDL_Color &c)
 	{
 		SDL_SetRenderDrawColor(render, c.r, c.g, c.b,0xFF);
 		SDL_RenderClear(render);
 	}
+
 	void BaseSDL::ClearRender(Uint8 r, Uint8 g, Uint8 b)
 	{
 		SDL_SetRenderDrawColor(render, r, g, b, 0xFF );
@@ -157,6 +119,7 @@ namespace Orz
 		SDL_SetRenderDrawColor(render, c.r, c.g, c.b,0xFF);
 		SDL_RenderDrawPoint(render, x, y);
 	}
+
 	void BaseSDL::DrawPoint(Uint8 r, Uint8 g, Uint8 b, int x, int y)
 	{
 		SDL_SetRenderDrawColor(render, r, g, b,0xFF);
@@ -168,6 +131,7 @@ namespace Orz
 		SDL_SetRenderDrawColor(render, c.r, c.g, c.b,0xFF);
 		SDL_RenderDrawLine(render, x1, y1, x2, y2);
 	}
+
 	void BaseSDL::DrawLine(Uint8 r, Uint8 g, Uint8 b, int x1, int y1, int x2, int y2)
 	{
 		SDL_SetRenderDrawColor(render, r, g, b, 0xFF );
@@ -184,11 +148,6 @@ namespace Orz
 	{
 		SDL_SetRenderDrawColor(render, c.r, c.g, c.b, c.a);
 		SDL_RenderDrawRect( render, &outline_rect );
-	}
-
-	void BaseSDL::Present(void)
-	{
-		SDL_RenderPresent(render);
 	}
 
 	void BaseSDL::DrawAlphaSolidColor(SDL_Color &c, Uint8 alpha,SDL_Rect &dest_rect)
@@ -221,6 +180,40 @@ namespace Orz
 	{
 		SDL_RenderSetViewport(render, NULL);
 	}
+
+	void BaseSDL::Present(void)
+	{
+		SDL_RenderPresent(render);
+	}
+
+	bool BaseSDL::DoTheThingsAfterCreateWindow()
+	{
+		// 初始化渲染器
+		render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+		// 初始化渲染器颜色
+		SDL_SetRenderDrawColor(render, 0XFF, 0XF, 0XF, 0XFF);
+
+		// 创建绘制工具用的纹理
+		solid_color_texture.CreateTargetTexture(SOLID_TEXTURE_SIZE, SOLID_TEXTURE_SIZE);
+		solid_color_texture.SetBlendMode(SDL_BLENDMODE_BLEND);
+
+		// 初始化SDL图片支持
+		IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+
+		// 初始化TTF
+		if(TTF_Init() == -1)
+		{
+			error_out("初始化 TTF_Init 失败!");
+			return false;
+		}
+
+		// 打开SDL的窗口拖拽打开文件功能
+		SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+
+		return true;
+	}
+
 }
 
 

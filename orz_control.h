@@ -9,7 +9,6 @@
 
 namespace Orz
 {
-
 	// 控件 - 文本框 - 背景为纯色
 	class ControlText: public BaseControl
 	{
@@ -148,6 +147,7 @@ namespace Orz
 		void DrawFill();
 
 	private:
+
 		// 禁止复制
 		ControlBar(const ControlBar& source);
 		ControlBar& operator=(const ControlBar& source);

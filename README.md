@@ -5,9 +5,9 @@
  1. 它是个音乐播放器
  2. 集合了 sdl   libzplay 以及 libiconv
  3. 我写的代码最核心的是红黑树的实现和控件的实现
- 4. 有可能发展成为一个GUI框架
+ 4. 有可能发展成为一个 UI 框架
  5. 两个命名空间 Orz(平台无关) Program(平台相关)
- 6. 仅供学习交流
+ 6. 此项目仅供学习交流
 
 ###截图
 
@@ -20,11 +20,13 @@
 ###工作方式
 解释为资源型程序,并非自顶端往下一条线发展
 
-其中 三个部分 互相访问
-device   
+其中 三个部分 它们可以互相访问,都是各自的友元
+         |- display
+device --|- sound
+         |- input
 platfrom  
-manage
-从名字上就很好理解了,具体见main.cpp文件的使用
+manager
+从名字上就很好理解了,具体见main.cpp文件和其他源文件的使用
 
 animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许直接访问
 

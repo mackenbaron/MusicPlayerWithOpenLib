@@ -1,8 +1,0 @@
-#ifndef ORZ_BASE_UTF8_H_INCLUDED
-#define ORZ_BASE_UTF8_H_INCLUDED
-
-class DecodeUTF8
-{
-};
-
-#endif // ORZ_BASE_UTF8_H_INCLUDED

@@ -1,6 +1,6 @@
 
-#ifndef ORZ_SDL_H_INCLUDED
-#define ORZ_SDL_H_INCLUDED
+#ifndef ORZ_BASE_SDL_H_INCLUDED
+#define ORZ_BASE_SDL_H_INCLUDED
 
 #include <SDL.h>
 #include <string>
@@ -8,14 +8,18 @@
 
 namespace Orz
 {
-    struct BaseSDL
+    class BaseSDL
     {
-    public:
-		friend class Platform;
-		~BaseSDL();
+		friend class _Platform;
+		friend class _Manager;
+		friend class _Device;
+		friend class BaseTexture;
 
 		// 初始化
 		bool Init(void);
+
+	public:
+		~BaseSDL();
 
         // 创建窗口
         bool CreateWindow(const std::string &WindowName, int Width, int Height);
@@ -48,11 +52,15 @@ namespace Orz
 		void SetViewport(SDL_Rect &ViewportRect);
 		void SetViewportToDefault();
 
-		// 呈现画面
-        void Present(void);
-        // 渲染器
-        SDL_Renderer *render;
 	private:
+
+        // 渲染器
+		SDL_Renderer *render;
+
+		// 呈现画面
+		void Present(void);
+		bool DoTheThingsAfterCreateWindow();
+
         // SDL 窗口
         SDL_Window *window;
 

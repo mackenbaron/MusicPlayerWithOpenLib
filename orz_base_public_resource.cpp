@@ -1,15 +1,12 @@
 
 #include "orz_base_public_resource.h"
-
-
-// 基本工具
-Orz::BaseSDL sdl;
+#include "orz_base_private_resource.h"
 
 // 平台
-Orz::Platform platform;
+Orz::_Platform platform;
 
 // 设备
-Orz::Device device;
+Orz::_Device device;
 
 // 管理者
-Orz::Management manager;
+Orz::_Manager manager;

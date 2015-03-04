@@ -48,6 +48,9 @@ namespace Orz
 		void Draw(int X, int Y);
 		void Draw(int X, int Y, float Rate);
 
+		void Render(const SDL_Rect& SourceRect, const SDL_Rect& DestRect);
+		void RenderEx(const SDL_Rect& SourceRect, const SDL_Rect& DestRect, const double Angle, SDL_Point& Center, SDL_RendererFlip FlipMod);
+
 		// 获得基本信息
 		SDL_Texture* GetTexture(void);
 		int GetWidth(void);

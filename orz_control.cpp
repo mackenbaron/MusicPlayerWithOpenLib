@@ -1,7 +1,6 @@
 
 #include "orz_control.h"
 #include "orz_base_time.h"
-#include "orz_option.h"
 #include "orz_log.h"
 #include "orz_base_public_resource.h"
 #include <string>
@@ -94,12 +93,11 @@ namespace Orz
 				SDL_Rect fill_rect = { x, y, width, height };
 				if(control_alpha == 255)
 				{
-					SDL_SetRenderDrawColor( sdl.render, background_color.r, background_color.g,background_color.b,background_color.a);
-					SDL_RenderFillRect( sdl.render, &fill_rect );
+					device.display.DrawFillRect(background_color, fill_rect);
 				}
 				else
 				{
-					sdl.DrawAlphaSolidColor(background_color, control_alpha, fill_rect);
+					device.display.DrawAlphaSolidColor(background_color, control_alpha, fill_rect);
 				}
 			}
 
@@ -117,12 +115,11 @@ namespace Orz
 				SDL_Rect fill_rect = { X, Y, width, height };
 				if(control_alpha == 255)
 				{
-					SDL_SetRenderDrawColor( sdl.render, background_color.r, background_color.g,background_color.b,background_color.a);
-					SDL_RenderFillRect( sdl.render, &fill_rect );
+					device.display.DrawFillRect(background_color, fill_rect);
 				}
 				else
 				{
-					sdl.DrawAlphaSolidColor(background_color, control_alpha, fill_rect);
+					device.display.DrawAlphaSolidColor(background_color, control_alpha, fill_rect);
 				}
 			}
 
@@ -266,10 +263,26 @@ namespace Orz
 
 	ControlButton& ControlButton::Contact(int MouseX, int MouseY, bool IsMouseDown)
 	{
-
+		// 本体
 		BaseControl::Contact(MouseX, MouseY, IsMouseDown);
 
-		background_sprite.Contact((SpriteState)control_state);
+		// 精灵
+		SpriteState curr_sprite_state;
+		switch(GetState())
+		{
+		case CONTROL_STATE_MOUSE_OUT:
+			curr_sprite_state = SPRITE_STATE_CONTROL_MOUSE_OUT;
+			break;
+		case CONTROL_STATE_MOUSE_OVER:
+			curr_sprite_state = SPRITE_STATE_CONTROL_MOUSE_OVER;
+			break;
+		case CONTROL_STATE_MOUSE_DOWN:
+			curr_sprite_state = SPRITE_STATE_CONTROL_MOUSE_DOWN;
+			break;
+		default:
+			curr_sprite_state = SPRITE_STATE_DEFAULT;
+		}
+		background_sprite.Contact(curr_sprite_state);
 	
 
 		return *this;
@@ -355,11 +368,11 @@ namespace Orz
 				
 				switch(control_state)
 				{
-				case CONTROL_BUTTON_MOUSE_OUT:
+				case CONTROL_STATE_MOUSE_OUT:
 					real_draw_color = background_color;
 					break;
 					
-				case CONTROL_BUTTON_MOUSE_OVER:
+				case CONTROL_STATE_MOUSE_OVER:
 					real_draw_color = background_color;
 					is_draw_outline = true;
 					real_draw_color.a = 255;
@@ -368,7 +381,7 @@ namespace Orz
 					real_draw_color.g = 255 - background_color.g;
 					break;
 
-				case CONTROL_BUTTON_MOUSE_DOWN:
+				case CONTROL_STATE_MOUSE_DOWN:
 					real_draw_color.a = 255;
 					real_draw_color.r = 255 - background_color.r;
 					real_draw_color.b = 255 - background_color.b;
@@ -378,18 +391,16 @@ namespace Orz
 
 				if(control_alpha == 255)
 				{
-					SDL_SetRenderDrawColor( sdl.render, real_draw_color.r, real_draw_color.g,real_draw_color.b,real_draw_color.a);
-					SDL_RenderFillRect( sdl.render, &fill_rect );
+					device.display.DrawFillRect(real_draw_color, fill_rect);
 				}
 				else
 				{
-					sdl.DrawAlphaSolidColor(real_draw_color, control_alpha, fill_rect);
+					device.display.DrawAlphaSolidColor(real_draw_color, control_alpha, fill_rect);
 				}
 
 				if (is_draw_outline)
 				{
-					SDL_SetRenderDrawColor( sdl.render, 255, real_draw_color.g,real_draw_color.b,0xFF);
-					SDL_RenderFillRect( sdl.render, &fill_rect );
+					device.display.DrawOutlineRect(real_draw_color, fill_rect);
 				}
 
 			}
@@ -418,11 +429,11 @@ namespace Orz
 
 				switch(control_state)
 				{
-				case CONTROL_BUTTON_MOUSE_OUT:
+				case SPRITE_STATE_CONTROL_MOUSE_OUT:
 					real_draw_color = background_color;
 					break;
 
-				case CONTROL_BUTTON_MOUSE_OVER:
+				case SPRITE_STATE_CONTROL_MOUSE_OVER:
 					real_draw_color = background_color;
 					is_draw_outline = true;
 					real_draw_color.a = 255;
@@ -431,7 +442,7 @@ namespace Orz
 					real_draw_color.g = 255 - background_color.g;
 					break;
 
-				case CONTROL_BUTTON_MOUSE_DOWN:
+				case SPRITE_STATE_CONTROL_MOUSE_DOWN:
 					real_draw_color.a = 255;
 					real_draw_color.r = 255 - background_color.r;
 					real_draw_color.b = 255 - background_color.b;
@@ -441,18 +452,16 @@ namespace Orz
 
 				if(control_alpha == 255)
 				{
-					SDL_SetRenderDrawColor( sdl.render, real_draw_color.r, real_draw_color.g,real_draw_color.b,real_draw_color.a);
-					SDL_RenderFillRect( sdl.render, &fill_rect );
+					device.display.DrawFillRect(real_draw_color, fill_rect);
 				}
 				else
 				{
-					sdl.DrawAlphaSolidColor(real_draw_color, control_alpha, fill_rect);
+					device.display.DrawAlphaSolidColor(real_draw_color, control_alpha, fill_rect);
 				}
 
 				if (is_draw_outline)
 				{
-					SDL_SetRenderDrawColor( sdl.render, 255, real_draw_color.g,real_draw_color.b,0xFF);
-					SDL_RenderFillRect( sdl.render, &fill_rect );
+					device.display.DrawOutlineRect(real_draw_color, fill_rect);
 				}
 
 			}
@@ -486,9 +495,9 @@ namespace Orz
 
 	ControlBar& ControlBar::Contact(int MouseX, int MouseY, bool IsMouseDown)
 	{
+		// 本体
 		BaseControl::Contact(MouseX, MouseY, IsMouseDown);
-
-		if (control_state == CONTROL_MOUSE_DOWN)
+		if (control_state == CONTROL_STATE_MOUSE_DOWN)
 		{
 			if (control_direct == CONTROL_DIRECT_UP_DOWN)
 			{
@@ -524,8 +533,24 @@ namespace Orz
 			}
 		}
 
-		background_sprite_trough.Contact((SpriteState)control_state);
-		background_sprite_bar.Contact((SpriteState)control_state);
+		// 精灵
+		SpriteState curr_sprite_state;
+		switch(GetState())
+		{
+		case CONTROL_STATE_MOUSE_OUT:
+			curr_sprite_state = SPRITE_STATE_CONTROL_MOUSE_OUT;
+			break;
+		case CONTROL_STATE_MOUSE_OVER:
+			curr_sprite_state = SPRITE_STATE_CONTROL_MOUSE_OVER;
+			break;
+		case CONTROL_STATE_MOUSE_DOWN:
+			curr_sprite_state = SPRITE_STATE_CONTROL_MOUSE_DOWN;
+			break;
+		default:
+			curr_sprite_state = SPRITE_STATE_DEFAULT;
+		}
+		background_sprite_trough.Contact(curr_sprite_state);
+		background_sprite_bar.Contact(curr_sprite_state);
 
 		return *this;
 	}
@@ -884,7 +909,7 @@ namespace Orz
 			{
 				Color real_draw_background_color_bar;
 
-				if (control_state==CONTROL_BUTTON_MOUSE_DOWN)
+				if (control_state==SPRITE_STATE_CONTROL_MOUSE_DOWN)
 				{
 					real_draw_background_color_bar.r = 255 - background_color_bar.r;
 					real_draw_background_color_bar.b = 255 - background_color_bar.b;
@@ -897,20 +922,18 @@ namespace Orz
 				if(control_alpha == 255)
 				{
 					// 绘制槽
-					SDL_SetRenderDrawColor( sdl.render, background_color_trough.r, background_color_trough.g, background_color_trough.b, 0xFF);
-					SDL_RenderFillRect( sdl.render, &trough_dest_rect );
+					device.display.DrawFillRect(background_color_trough, trough_dest_rect );
 
 					// 绘制点
-					SDL_SetRenderDrawColor( sdl.render, real_draw_background_color_bar.r, real_draw_background_color_bar.g,real_draw_background_color_bar.b, 0xFF);
-					SDL_RenderFillRect( sdl.render, &bar_dest_rect );
+					device.display.DrawFillRect(background_color_bar, bar_dest_rect);
 				}
 				else
 				{
 					// 绘制槽
-					sdl.DrawAlphaSolidColor(background_color_trough, control_alpha, trough_dest_rect);
+					device.display.DrawAlphaSolidColor(background_color_trough, control_alpha, trough_dest_rect);
 
 					// 绘制点
-					sdl.DrawAlphaSolidColor(real_draw_background_color_bar, control_alpha, bar_dest_rect);
+					device.display.DrawAlphaSolidColor(real_draw_background_color_bar, control_alpha, bar_dest_rect);
 				}
 
 			}
@@ -922,9 +945,8 @@ namespace Orz
 
 
 #ifdef CodeDebug
-			SDL_SetRenderDrawColor(sdl.render, 255, 10, 20, 0xFF );
-			SDL_RenderDrawRect(sdl.render, &trough_dest_rect);
-			SDL_RenderDrawRect(sdl.render, &bar_dest_rect);
+			device.display.DrawOutlineRect(RedColor, trough_dest_rect);
+			device.display.DrawOutlineRect(RedColor, bar_dest_rect);
 #endif
 			
 		}
@@ -953,13 +975,13 @@ namespace Orz
 			{
 				Color real_draw_background_color_bar;
 
-				if (control_state==CONTROL_BUTTON_MOUSE_DOWN)
+				if (control_state==SPRITE_STATE_CONTROL_MOUSE_DOWN)
 				{
 					real_draw_background_color_bar.r = background_color_bar.r * 0.5;
 					real_draw_background_color_bar.g = background_color_bar.r * 0.5;
 					real_draw_background_color_bar.b = background_color_bar.r * 0.5;
 
-				}else if (control_state==CONTROL_BUTTON_MOUSE_OVER)
+				}else if (control_state==SPRITE_STATE_CONTROL_MOUSE_OVER)
 				{
 					real_draw_background_color_bar.r = background_color_bar.r * 0.8;
 					real_draw_background_color_bar.g = background_color_bar.r * 0.8;
@@ -973,20 +995,15 @@ namespace Orz
 				if(control_alpha == 255)
 				{
 					// 绘制槽
-					SDL_SetRenderDrawColor( sdl.render, background_color_trough.r, background_color_trough.g, background_color_trough.b, 0xFF);
-					SDL_RenderFillRect( sdl.render, &trough_dest_rect );
+					device.display.DrawFillRect(background_color_trough, trough_dest_rect );
 
 					// 绘制点
-					SDL_SetRenderDrawColor( sdl.render, real_draw_background_color_bar.r, real_draw_background_color_bar.g,real_draw_background_color_bar.b, 0xFF);
-					SDL_RenderFillRect( sdl.render, &bar_dest_rect );
+					device.display.DrawFillRect(background_color_bar, bar_dest_rect);
 				}
 				else
 				{
-					// 绘制槽
-					sdl.DrawAlphaSolidColor(background_color_trough, control_alpha, trough_dest_rect);
-
-					// 绘制点
-					sdl.DrawAlphaSolidColor(real_draw_background_color_bar, control_alpha, bar_dest_rect);
+					background_sprite_trough.Draw(trough_dest_rect);
+					background_sprite_bar.Draw(bar_dest_rect);
 				}
 
 			}
@@ -998,9 +1015,8 @@ namespace Orz
 
 
 #ifdef CodeDebug
-			SDL_SetRenderDrawColor(sdl.render, 255, 10, 20, 0xFF );
-			SDL_RenderDrawRect(sdl.render, &trough_dest_rect);
-			SDL_RenderDrawRect(sdl.render, &bar_dest_rect);
+			device.display.DrawOutlineRect(RedColor, trough_dest_rect);
+			device.display.DrawOutlineRect(RedColor, bar_dest_rect);
 #endif
 
 		}
@@ -1194,6 +1210,7 @@ namespace Orz
 
 	ControlList& ControlList::Contact(int MouseX, int MouseY, bool IsMouseDown)
 	{
+		// 本体
 		BaseControl::Contact(MouseX, MouseY, IsMouseDown);
 
 		is_any_control_text_have_message = false;
@@ -1206,7 +1223,7 @@ namespace Orz
 			for(int i=0; i < list.size(); ++i)
 			{
 				list[i]->Contact(MouseX, mouse_y, IsMouseDown);
-				if (list[i]->GetState() == CONTROL_MOUSE_DOWN ||list[i]->GetState() == CONTROL_MOUSE_OVER)
+				if (list[i]->GetState() == CONTROL_STATE_MOUSE_DOWN ||list[i]->GetState() == CONTROL_STATE_MOUSE_OVER)
 				{
 					is_any_control_text_have_message = true;
 					position_of_control_text_that_have_message = i;
@@ -1219,7 +1236,7 @@ namespace Orz
 			for(int i=0; i < list.size(); ++i)
 			{
 				list[i]->Contact(mouse_x, mouse_y, IsMouseDown);
-				if (list[i]->GetState() == CONTROL_MOUSE_DOWN ||list[i]->GetState() == CONTROL_MOUSE_OVER)
+				if (list[i]->GetState() == CONTROL_STATE_MOUSE_DOWN ||list[i]->GetState() == CONTROL_STATE_MOUSE_OVER)
 				{
 					is_any_control_text_have_message = true;
 					position_of_control_text_that_have_message = i;
@@ -1228,8 +1245,26 @@ namespace Orz
 			}
 		}
 		
-
+		// 滚动条
 		control_bar.Contact(MouseX, MouseY, IsMouseDown);
+
+		// 精灵
+		SpriteState curr_sprite_state;
+		switch(GetState())
+		{
+		case CONTROL_STATE_MOUSE_OUT:
+			curr_sprite_state = SPRITE_STATE_CONTROL_MOUSE_OUT;
+			break;
+		case CONTROL_STATE_MOUSE_OVER:
+			curr_sprite_state = SPRITE_STATE_CONTROL_MOUSE_OVER;
+			break;
+		case CONTROL_STATE_MOUSE_DOWN:
+			curr_sprite_state = SPRITE_STATE_CONTROL_MOUSE_DOWN;
+			break;
+		default:
+			curr_sprite_state = SPRITE_STATE_DEFAULT;
+		}
+		background_sprite.Contact(curr_sprite_state);
 
 		return *this;
 	}
@@ -1324,12 +1359,11 @@ namespace Orz
 			{
 				if(control_alpha == 255)
 				{
-					SDL_SetRenderDrawColor( sdl.render, real_draw_background_color.r, real_draw_background_color.g,real_draw_background_color.b, 0xFF);
-					SDL_RenderFillRect( sdl.render, &real_list_dest_rect );
+					device.display.DrawFillRect(real_draw_background_color,  real_list_dest_rect);
 				}
 				else
 				{
-					sdl.DrawAlphaSolidColor(real_draw_background_color, control_alpha, real_list_dest_rect);
+					device.display.DrawAlphaSolidColor(real_draw_background_color, control_alpha, real_list_dest_rect);
 				}
 			} 
 			else
@@ -1343,14 +1377,14 @@ namespace Orz
 			if (total_list_height > height)
 			{
 				start_point_y =  - (total_list_height - height) * control_bar.GetPercent();
-				sdl.SetViewport(real_list_dest_rect);
+				device.display.SetViewport(real_list_dest_rect);
 
 				for(int i=0; i < list.size(); ++i)
 				{
 					list[i]->Draw(x, start_point_y);
 					start_point_y += entry_height;
 				}
-				sdl.SetViewportToDefault();
+				device.display.SetViewportToDefault();
 			} 
 			else
 			{
@@ -1369,7 +1403,6 @@ namespace Orz
 
 	void ControlList::DrawFill()
 	{
-
 		if (is_show)
 		{
 			// 绘制列表
@@ -1380,12 +1413,11 @@ namespace Orz
 			{
 				if(control_alpha == 255)
 				{
-					SDL_SetRenderDrawColor( sdl.render, real_draw_background_color.r, real_draw_background_color.g,real_draw_background_color.b, 0xFF);
-					SDL_RenderFillRect( sdl.render, &real_list_dest_rect );
+					device.display.DrawFillRect( real_draw_background_color , real_list_dest_rect);
 				}
 				else
 				{
-					sdl.DrawAlphaSolidColor(real_draw_background_color, control_alpha, real_list_dest_rect);
+					device.display.DrawAlphaSolidColor(real_draw_background_color, control_alpha, real_list_dest_rect);
 				}
 			} 
 			else
@@ -1399,7 +1431,7 @@ namespace Orz
 			if (total_list_height > height)
 			{
 				start_point_y = - (total_list_height - height) * control_bar.GetPercent();
-				sdl.SetViewport(real_list_dest_rect);
+				device.display.SetViewport(real_list_dest_rect);
 
 				for (std::vector<ControlText*>::iterator item = list.begin(); item != list.end(); ++item)
 				{
@@ -1407,7 +1439,7 @@ namespace Orz
 					start_point_y += entry_height;
 				}
 
-				sdl.SetViewportToDefault();
+				device.display.SetViewportToDefault();
 			} 
 			else
 			{

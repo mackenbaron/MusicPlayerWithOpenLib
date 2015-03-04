@@ -1,8 +1,6 @@
 #ifndef ORZ_BASE_CONTROL_H_INCLUDED
 #define ORZ_BASE_CONTROL_H_INCLUDED
 
-#include <SDL.h>
-#include <iostream>
 #include "orz_base_math.h"
 #include "orz_base_texture.h"
 #include "orz_writer.h"
@@ -56,7 +54,6 @@ namespace Orz
     class BaseControl
     {
     public:
-
 		// ¹¹Ôìº¯Êý
 		BaseControl(int X, int Y, int Width, int Height, ControlBackgroundStyle BackgroundStyle);
 

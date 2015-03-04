@@ -1,8 +1,7 @@
 
 #include "orz_sprite.h"
 #include "orz_log.h"
-#include "orz_option.h"
-#include <iostream>
+#include "orz_config.h"
 #include <string>
 
 
@@ -98,7 +97,7 @@ namespace Orz
 		dest_rect.w = Width;
 		dest_rect.h = Height;
 
-		curr_state = CONTROL_BUTTON_MOUSE_OUT;
+		curr_state = SPRITE_STATE_DEFAULT;
 
 		return succed;
 	}
