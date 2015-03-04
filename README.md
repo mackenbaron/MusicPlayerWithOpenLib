@@ -20,13 +20,13 @@
 ###工作方式
 解释为资源型程序,并非自顶端往下一条线发展
 
-其中 三个部分 它们可以互相访问,都是各自的友元
-         |- display
-device --|- sound
-         |- input
-platfrom  
-manager
-从名字上就很好理解了,具体见main.cpp文件和其他源文件的使用
+其中 三个部分 它们可以互相访问,都是各自的友元<br>
+         |- display<br>
+device --|- sound<br>
+         |- input<br>
+platfrom  <br>
+manager<br>
+从名字上就很好理解了,具体见main.cpp文件和其他源文件的使用<br>
 
 animate sprite 和 cotrol??(Text,Button,...) 通过manage间接,用户不容许直接访问
 
