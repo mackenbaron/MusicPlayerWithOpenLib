@@ -3,6 +3,7 @@
 
 #include "orz_base_control.h"
 #include "orz_sprite.h"
+#include "orz_writer.h"
 #include <string>
 
 #define CONTROL_BAR_OCCUPY_CONTROL_LIST_PERCENT (0.08) // 0.0 ~ 1.0
@@ -37,8 +38,7 @@ namespace Orz
 		ControlText& ChangeToUseColorBackground();
 
 		// »æÖÆ
-		void Draw();
-		void Draw(int X, int Y);
+		void DoDraw();
 
 	private:
 		// ½ûÖ¹¸´ÖÆ
@@ -89,7 +89,7 @@ namespace Orz
 		ControlButton& ChangeToUseSpriteBackground();
 
 		// »æÖÆ
-		void Draw();
+		void DoDraw();
 		void DrawFill();
 
 	private:
@@ -143,7 +143,7 @@ namespace Orz
 		ControlBar& ChangeToUseSpriteBackground();
 
 		// »æÖÆ
-		void Draw();
+		void DoDraw();
 		void DrawFill();
 
 	private:
@@ -210,8 +210,7 @@ namespace Orz
 		ControlText* GetControlTextThatHaveMessage();
 
 		// »æÖÆ
-		void Draw();
-		void DrawFill();
+		void DoDraw();
 
 	private:
 		// ½ûÖ¹¸´ÖÆ

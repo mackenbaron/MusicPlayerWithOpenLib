@@ -18,24 +18,12 @@ namespace Orz
 		CONTROL_DIRECT_LEFT_RIGHT
 	};
 
-	enum ElementMessage
-	{
-		ELEMENT_MESSAGE_FUNCTION_ERROR,
-
-		ELEMENT_MESSAGE_MOUSE_OVER,	// 鼠标在控件内
-		ELEMENT_MESSAGE_MOUSE_OUT,	// 鼠标在控件外
-		ELEMENT_MESSAGE_MOUSE_CONST_DOWN,	// 鼠标在控件内|持续按下
-		ELEMENT_MESSAGE_MOUSE_CONST_DOWN_END,// 鼠标在控件内|持续按下结束消息
-		ELEMENT_MESSAGE_MOUSE_CLICK,		// 鼠标在控件内|单击
-		ELEMENT_MESSAGE_MOUSE_DOUBLE_CLICK	// 鼠标在控件内|双击
-	};
-
 	enum ControlMessage
 	{
 		CONTROL_MESSAGE_FUNCTION_ERROR,
 
-		CONTROL_MESSAGE_MOUSE_OVER,	// 鼠标在控件内
 		CONTROL_MESSAGE_MOUSE_OUT,	// 鼠标在控件外
+		CONTROL_MESSAGE_MOUSE_OVER,	// 鼠标在控件内
 		CONTROL_MESSAGE_MOUSE_CONST_DOWN,	// 鼠标在控件内|持续按下
 		CONTROL_MESSAGE_MOUSE_CONST_DOWN_END,// 鼠标在控件内|持续按下结束消息
 		CONTROL_MESSAGE_MOUSE_CLICK,		// 鼠标在控件内|单击
@@ -44,8 +32,8 @@ namespace Orz
 
 	enum ControlState
 	{
-		CONTROL_STATE_MOUSE_OUT,
 		CONTROL_STATE_MOUSE_OVER,
+		CONTROL_STATE_MOUSE_OUT,
 		CONTROL_STATE_MOUSE_DOWN
 	};
 
@@ -59,6 +47,13 @@ namespace Orz
 		SPRITE_STATE_CONTROL_MOUSE_OVER	= 1,
 		SPRITE_STATE_CONTROL_MOUSE_DOWN	= 2,
 
+	};
+
+
+	enum ElementRenderStyle
+	{
+		ELEMENT_RENDER_STYLE_FULL,	// 铺满
+		ELEMENT_RENDER_STYLE_FILL	// 填充
 	};
 
 	enum ControlBackgroundStyle
@@ -122,6 +117,7 @@ namespace Orz
 
 		KEY_MAX
 	};
+
 	struct MusicTimeTable
 	{
 		unsigned int hour, minute, second, millisecond;

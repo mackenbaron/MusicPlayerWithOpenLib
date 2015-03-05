@@ -6,17 +6,10 @@
 #include "orz_writer.h"
 #include "orz_base_RBTree.h"
 #include "orz_control.h"
+#include "orz_base_element.h"
 
 namespace Orz
 {
-	class BaseElement
-	{
-
-	private:
-		Rect size;
-		float distance;
-	};
-
 	class _Manager
 	{
 	public:
@@ -66,6 +59,9 @@ namespace Orz
 
 		// ºìºÚÊ÷
 		RBTree rb_tree;
+		
+		// ÔªËØ¶¥
+		 BaseElement element_root;
 	};
 }
 

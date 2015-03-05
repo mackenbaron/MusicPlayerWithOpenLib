@@ -67,7 +67,7 @@ bool CreateScene()
 	platform.GetWindowSize(sw, sh);
 
 	// 歌曲------------------------------
-	device.sound.Load("resource\\Beyond-光辉岁月.mp3");// Back To Your Heart feat.mp3 Beyond-光辉岁月.mp3
+	device.sound.Load("E:\\Music\\四个女生-心愿.mp3");// Back To Your Heart feat.mp3 Beyond-光辉岁月.mp3
 	device.sound.Play();
 	device.sound.GetTotalTime(total_time_table);
 
@@ -158,7 +158,6 @@ void UpdateScene()
 
 		manager.GetControlList("first_list").PushBack(play_list.GetSongList().back().path_utf8.c_str(), play_list.GetSongList().back().name_utf8.c_str());
 
-
 		if (device.sound.Load(path.c_str()))
 		{
 			device.sound.Play();
@@ -197,7 +196,7 @@ void UpdateScene()
 	{
 		manager.GetControlBar("first_bar").ChangePercent((float)elapsed_time_table.GetTotalTimeBySecond()/total_time_table.GetTotalTimeBySecond());
 	}
-	manager.GetControlBar("first_bar").Draw();
+	manager.GetControlBar("first_bar").DoDraw();
 
 	// 绘制 FFT------------------------------------------------------------------------
 	Color color_red = {255,255,0,0};
@@ -278,8 +277,14 @@ void UpdateScene()
 
 
 	// 按钮x---------------------------------------------------------------------------------
-	manager.GetControlButton("first_button").Show();
-	if (my == 0 || manager.GetControlButton("first_button").GetMessage() == CONTROL_MESSAGE_MOUSE_OVER)
+
+	if (my == 0)
+	{
+		manager.GetControlButton("first_button").Show();
+		manager.GetControlButton("first_button").Contact(mx, my, device.input.GetButton(KEY_MOUSE_LEFT));
+	}
+
+	if ( manager.GetControlButton("first_button").GetMessage() == CONTROL_MESSAGE_MOUSE_OVER)
 	{
 		manager.GetControlButton("first_button").Contact(mx, my, device.input.GetButton(KEY_MOUSE_LEFT));
 		
@@ -293,12 +298,13 @@ void UpdateScene()
 		manager.GetControlButton("first_button").Hide();
 	}
 
-	manager.GetControlButton("first_button").Draw();
+	manager.GetControlButton("first_button").DoDraw();
 	
 	// 列表控件------------------------------------------------------------------------------
 	manager.GetControlList("first_list").Show();
 	if (mx==0||manager.GetControlList("first_list").GetState() == CONTROL_STATE_MOUSE_OVER||manager.GetControlList("first_list").GetState() == CONTROL_STATE_MOUSE_DOWN)
 	{
+
 		manager.GetControlList("first_list").Contact(mx, my, device.input.GetButton(KEY_MOUSE_LEFT));
 		if (device.input.GetMouseWheel())
 			manager.GetControlList("first_list").ChangePercent(manager.GetControlList("first_list").GetPercent()-0.1*device.input.GetMouseWheel());
@@ -331,7 +337,7 @@ void UpdateScene()
 		manager.GetControlList("first_list").Hide();
 	}
 
-	manager.GetControlList("first_list").DrawFill();
+	manager.GetControlList("first_list").ChangeRenderStyle(ELEMENT_RENDER_STYLE_FILL).Draw();
 
 	
 

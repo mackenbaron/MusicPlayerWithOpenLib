@@ -1,12 +1,14 @@
 #ifndef ORZ_BASE_PRIVATE_RESOURCE_INCLUDE
 #define ORZ_BASE_PRIVATE_RESOURCE_INCLUDE
 
+
 // 类
 #include "orz_base_sdl.h"
+#include "orz_base_element.h"
 
+extern Orz::BaseSDL sdl;
 
-// 基本工具
-//extern Orz::BaseSDL sdl;
+extern Orz::BaseElement error_element;
 
 
 #endif

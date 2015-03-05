@@ -5,7 +5,9 @@
 
 namespace Orz
 {
-	_Manager::_Manager():is_loop(true)
+	_Manager::_Manager():
+	element_root(ELEMENT_TYPE_ROOT, 0, 0, 0, 0, -0.1f),
+	is_loop(true)
 	{
 	}
 

@@ -9,7 +9,7 @@ namespace Orz
 {
 	//  文本控件------------------------------------------------------------------
 	ControlText::ControlText():
-	BaseControl(0, 0, 0, 0, SOLID_COLOR),
+	BaseControl(ELEMENT_TYPE_CONTROL_TEXT, 0, 0, 0, 0, SOLID_COLOR),
 	is_transparent(false),
 	control_alpha(255)
 	{
@@ -19,7 +19,7 @@ namespace Orz
 	
 	bool ControlText::CreateControlText(const char *ControlName, int X, int Y, int Width, int Height, const char *FontName, int FontSize, const char* Text, Color &TextColor, Color &BackgroundColor)
 	{
-		control_name = ControlName;
+		element_name = ControlName;
 		Color black_color = {0,0,0,0};
 		Rect temp_rect = {X, Y, Width, Height};
 		text_writer.CreateWriter(FontName, Text, FontSize, TextColor, temp_rect);
@@ -84,7 +84,7 @@ namespace Orz
 		return *this;
 	}
 
-	void ControlText::Draw()
+	void ControlText::DoDraw()
 	{
 		if(is_show)
 		{
@@ -105,31 +105,31 @@ namespace Orz
 		}
 	}
 
-	void ControlText::Draw(int X, int Y)
-	{
+	//void ControlText::Draw(int X, int Y)
+	//{
 
-		if(is_show)
-		{
-			if(!is_transparent)
-			{
-				SDL_Rect fill_rect = { X, Y, width, height };
-				if(control_alpha == 255)
-				{
-					device.display.DrawFillRect(background_color, fill_rect);
-				}
-				else
-				{
-					device.display.DrawAlphaSolidColor(background_color, control_alpha, fill_rect);
-				}
-			}
+	//	if(is_show)
+	//	{
+	//		if(!is_transparent)
+	//		{
+	//			SDL_Rect fill_rect = { X, Y, width, height };
+	//			if(control_alpha == 255)
+	//			{
+	//				device.display.DrawFillRect(background_color, fill_rect);
+	//			}
+	//			else
+	//			{
+	//				device.display.DrawAlphaSolidColor(background_color, control_alpha, fill_rect);
+	//			}
+	//		}
 
-			text_writer.Write(X, Y);
-		}
-	}
+	//		text_writer.Write(X, Y);
+	//	}
+	//}
 
 	// 按钮控件--------------------------------------------------------------
 	ControlButton::ControlButton():
-	BaseControl(0,0,0,0, SOLID_COLOR),
+	BaseControl(ELEMENT_TYPE_CONTROL_BUTTON, 0,0,0,0, SOLID_COLOR),
 	is_show_text(true),
 	is_solid_color_background(true),
 	control_alpha(255)
@@ -198,7 +198,7 @@ namespace Orz
 						break;
 					}
 				}
-				control_name = var;
+				element_name = var;
 
 				// 设置位置
 				x = X;
@@ -356,7 +356,7 @@ namespace Orz
 		return *this;
 	}
 
-	void ControlButton::Draw()
+	void ControlButton::DoDraw()
 	{
 		if(is_show)
 		{
@@ -482,7 +482,7 @@ namespace Orz
 
 	// 滚动条控件-----------------------------------------------------------------
 	ControlBar::ControlBar():
-	BaseControl(0,0,0,0, SOLID_COLOR),
+	BaseControl( ELEMENT_TYPE_CONTROL_BAR,0,0,0,0, SOLID_COLOR),
 	control_direct(CONTROL_DIRECT_UP_DOWN),
 	is_solid_color_background(true),
 	control_alpha(255),
@@ -665,7 +665,7 @@ namespace Orz
 						break;
 					}
 				}
-				control_name = var;
+				element_name = var;
 
 				// 读取滚动条方向
 				fgets(buff, 254, fp);
@@ -813,7 +813,7 @@ namespace Orz
 
 	bool ControlBar::CreateControlBar(const char* Name, ControlDirect Direct, Rect &TroughRect, int BarWidth, int BarHeight, float CenterX, float CenterY, Color &BackgroundColorTrough, Color &BackgroundColorBar)
 	{
-		control_name = Name;
+		element_name = Name;
 		
 		control_direct = Direct;
 		
@@ -886,7 +886,7 @@ namespace Orz
 		return *this;
 	}
 
-	void ControlBar::Draw()
+	void ControlBar::DoDraw()
 	{
 		if(is_show)
 		{
@@ -911,13 +911,21 @@ namespace Orz
 
 				if (control_state==SPRITE_STATE_CONTROL_MOUSE_DOWN)
 				{
-					real_draw_background_color_bar.r = 255 - background_color_bar.r;
-					real_draw_background_color_bar.b = 255 - background_color_bar.b;
-					real_draw_background_color_bar.g = 255 - background_color_bar.g;
-				}else
+					real_draw_background_color_bar.r = background_color_bar.r * 0.5;
+					real_draw_background_color_bar.g = background_color_bar.r * 0.5;
+					real_draw_background_color_bar.b = background_color_bar.r * 0.5;
+
+				}else if (control_state==SPRITE_STATE_CONTROL_MOUSE_OVER)
+				{
+					real_draw_background_color_bar.r = background_color_bar.r * 0.8;
+					real_draw_background_color_bar.g = background_color_bar.r * 0.8;
+					real_draw_background_color_bar.b = background_color_bar.r * 0.8;
+				}
+				else
 				{
 					real_draw_background_color_bar = background_color_bar;
 				}
+
 
 				if(control_alpha == 255)
 				{
@@ -925,7 +933,7 @@ namespace Orz
 					device.display.DrawFillRect(background_color_trough, trough_dest_rect );
 
 					// 绘制点
-					device.display.DrawFillRect(background_color_bar, bar_dest_rect);
+					device.display.DrawFillRect(real_draw_background_color_bar, bar_dest_rect);
 				}
 				else
 				{
@@ -998,12 +1006,15 @@ namespace Orz
 					device.display.DrawFillRect(background_color_trough, trough_dest_rect );
 
 					// 绘制点
-					device.display.DrawFillRect(background_color_bar, bar_dest_rect);
+					device.display.DrawFillRect(real_draw_background_color_bar, bar_dest_rect);
 				}
 				else
 				{
-					background_sprite_trough.Draw(trough_dest_rect);
-					background_sprite_bar.Draw(bar_dest_rect);
+					// 绘制槽
+					device.display.DrawAlphaSolidColor(background_color_trough, control_alpha, trough_dest_rect);
+
+					// 绘制点
+					device.display.DrawAlphaSolidColor(real_draw_background_color_bar, control_alpha, bar_dest_rect);
 				}
 
 			}
@@ -1025,7 +1036,7 @@ namespace Orz
 
 	// 列表控件--------------------------------------------------------------
 	ControlList::ControlList():
-	BaseControl(0, 0, 0, 0, SOLID_COLOR),
+	BaseControl( ELEMENT_TYPE_CONTROL_LIST,0, 0, 0, 0, SOLID_COLOR),
 	is_solid_color_background(true),
 	is_any_control_text_have_message(false),
 	control_bar_occupy_percent(CONTROL_BAR_OCCUPY_CONTROL_LIST_PERCENT),
@@ -1108,7 +1119,7 @@ namespace Orz
 						break;
 					}
 				}
-				control_name = var;
+				element_name = var;
 
 				// 设置位置
 				x = X;
@@ -1347,7 +1358,7 @@ namespace Orz
 		return *this;
 	}
 
-	void ControlList::Draw()
+	void ControlList::DoDraw()
 	{
 		if (is_show)
 		{
@@ -1381,7 +1392,9 @@ namespace Orz
 
 				for(int i=0; i < list.size(); ++i)
 				{
-					list[i]->Draw(x, start_point_y);
+					//list[i]->Draw(x, start_point_y);
+					//list[i]->ChangePosition(x, start_point_y);
+					list[i]->DoDraw();
 					start_point_y += entry_height;
 				}
 				device.display.SetViewportToDefault();
@@ -1391,68 +1404,24 @@ namespace Orz
 				start_point_y = y;
 				for(int i=0; i < list.size(); ++i)
 				{
-					list[i]->Draw(x, start_point_y);
+					//list[i]->Draw(x, start_point_y);
+					//list[i]->ChangePosition(x, start_point_y);
+					list[i]->DoDraw();
 					start_point_y += entry_height;
 				}
 			}
 
 			// 绘制滚动条控件
-			control_bar.Draw();
-		}
-	}
-
-	void ControlList::DrawFill()
-	{
-		if (is_show)
-		{
-			// 绘制列表
-			Rect real_list_dest_rect = {x, y, width - control_bar.GetSizeWidth(), height};
-			Color real_draw_background_color = background_color;
-
-			if (is_solid_color_background)
+			switch(element_render_style)
 			{
-				if(control_alpha == 255)
-				{
-					device.display.DrawFillRect( real_draw_background_color , real_list_dest_rect);
-				}
-				else
-				{
-					device.display.DrawAlphaSolidColor(real_draw_background_color, control_alpha, real_list_dest_rect);
-				}
-			} 
-			else
-			{
-				background_sprite.DrawFill(real_list_dest_rect);
+			case ELEMENT_RENDER_STYLE_FILL:
+				control_bar.ChangeRenderStyle(ELEMENT_RENDER_STYLE_FILL);
+				break;
+			case ELEMENT_RENDER_STYLE_FULL:
+				control_bar.ChangeRenderStyle(ELEMENT_RENDER_STYLE_FULL);
+				break;
 			}
-
-			// 绘制条目
-			int start_point_y = 0;
-			int total_list_height = list.size() * entry_height;
-			if (total_list_height > height)
-			{
-				start_point_y = - (total_list_height - height) * control_bar.GetPercent();
-				device.display.SetViewport(real_list_dest_rect);
-
-				for (std::vector<ControlText*>::iterator item = list.begin(); item != list.end(); ++item)
-				{
-					(*item)->Draw(x, start_point_y);
-					start_point_y += entry_height;
-				}
-
-				device.display.SetViewportToDefault();
-			} 
-			else
-			{
-				start_point_y = y;
-				for (std::vector<ControlText*>::iterator item = list.begin(); item != list.end(); ++item)
-				{
-					(*item)->Draw(x, start_point_y);
-					start_point_y += entry_height;
-				}
-			}
-
-			// 绘制滚动条
-			control_bar.DrawFill();
+			control_bar.DoDraw();
 		}
 	}
 
