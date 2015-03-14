@@ -56,7 +56,7 @@ namespace Orz
 						SDL_WINDOWPOS_UNDEFINED,    // 窗口的X坐标
 						SDL_WINDOWPOS_UNDEFINED,    // 窗口的Y坐标
 						Width, Height,
-						NULL);//SDL_WINDOW_SHOWN);//|SDL_WINDOW_FULLSCREEN //BORDERLESS);     // 调整为无边框窗口、全屏
+						SDL_WINDOW_BORDERLESS);// NULL);//SDL_WINDOW_SHOWN);//|SDL_WINDOW_FULLSCREEN //BORDERLESS);     // 调整为无边框窗口、全屏
 
 
 		// 检测是否成功
@@ -138,22 +138,22 @@ namespace Orz
 		SDL_RenderDrawLine(render, x1, y1, x2, y2);
 	}
 
-	void BaseSDL::DrawFillRect(const SDL_Color &c, SDL_Rect &fill_rect)
+	void BaseSDL::DrawFillRect(const SDL_Color &c, const SDL_Rect &fill_rect)
 	{
 		SDL_SetRenderDrawColor(render, c.r, c.g, c.b, c.a);
 		SDL_RenderFillRect( render, &fill_rect );
 	}
 
-	void BaseSDL::DrawOutlineRect(const SDL_Color &c, SDL_Rect &outline_rect)
+	void BaseSDL::DrawOutlineRect(const SDL_Color &c, const SDL_Rect &outline_rect)
 	{
 		SDL_SetRenderDrawColor(render, c.r, c.g, c.b, c.a);
 		SDL_RenderDrawRect( render, &outline_rect );
 	}
 
-	void BaseSDL::DrawAlphaSolidColor(SDL_Color &c, Uint8 alpha,SDL_Rect &dest_rect)
+	void BaseSDL::DrawAlphaFillRect(const SDL_Color &c, Uint8 alpha, const SDL_Rect &dest_rect)
 	{
 		// 变更渲染目标
-		solid_color_texture.SetAsRenderTarget();
+		solid_color_texture.ChangeAsRenderTarget();
 
 		// 渲染相应颜色
 		SDL_SetRenderDrawColor(render, c.r, c.g, c.b, c.a);
@@ -162,8 +162,8 @@ namespace Orz
 		// 渲染目标转为默认
 		SDL_SetRenderTarget(render, NULL);
 		SDL_Rect source_rect = {0, 0, SOLID_TEXTURE_SIZE, SOLID_TEXTURE_SIZE};
-		solid_color_texture.SetAlpha(alpha);
-		SDL_RenderCopy(render, solid_color_texture.GetTexture(), &source_rect, &dest_rect);
+		solid_color_texture.ChangeAlpha(alpha);
+		solid_color_texture.Render(source_rect,	dest_rect);
 	}
 
 	void BaseSDL::SetDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
@@ -171,7 +171,17 @@ namespace Orz
 		SDL_SetRenderDrawColor(render, r, g, b, a);
 	}
 
-	void BaseSDL::SetViewport(SDL_Rect &ViewportRect)
+	void BaseSDL::SetClip(const SDL_Rect &ClipRect)
+	{
+		SDL_RenderSetClipRect(render, &ClipRect);
+	}
+
+	void BaseSDL::SetClipToNull(void)
+	{
+		SDL_RenderSetClipRect(render, NULL);
+	}
+
+	void BaseSDL::SetViewport(const SDL_Rect &ViewportRect)
 	{
 		SDL_RenderSetViewport(render, &ViewportRect);
 	}
@@ -195,8 +205,8 @@ namespace Orz
 		SDL_SetRenderDrawColor(render, 0XFF, 0XF, 0XF, 0XFF);
 
 		// 创建绘制工具用的纹理
-		solid_color_texture.CreateTargetTexture(SOLID_TEXTURE_SIZE, SOLID_TEXTURE_SIZE);
-		solid_color_texture.SetBlendMode(SDL_BLENDMODE_BLEND);
+		solid_color_texture.CreateTargetAbleTexture(SOLID_TEXTURE_SIZE, SOLID_TEXTURE_SIZE);
+		solid_color_texture.ChangeBlendMode(SDL_BLENDMODE_BLEND);
 
 		// 初始化SDL图片支持
 		IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);

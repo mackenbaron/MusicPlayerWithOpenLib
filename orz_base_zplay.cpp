@@ -214,7 +214,7 @@ namespace Orz
 		unsigned long _current_time = GetTickTime();
 		if (_current_time - last_get_fft_time > 30)
 		{
-			if (0==player->GetFFTData(FFT_POINT_NUNBER, fwLanczos, &NumberOfHarmonics, NULL, FFTDataLeft, FFTDataRight, NULL, NULL))
+			if (0==player->GetFFTData(FFT_POINT_NUNBER, fwBartlettHann, &NumberOfHarmonics, NULL, FFTDataLeft, FFTDataRight, NULL, NULL))
 			{
 				cout<<"BaseZPlay::GetFFTDate »ñÈ¡ FFTData Ê§°Ü"<<endl;
 

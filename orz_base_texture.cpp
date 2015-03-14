@@ -1,291 +1,284 @@
 
 #include "orz_base_texture.h"
-
-#include <SDL_image.h>
-#include "orz_log.h"
 #include "orz_base_public_resource.h"
+#include <SDL_image.h>
 
 namespace Orz
 {
-	BaseTexture::BaseTexture()
+	BaseTexture::BaseTexture():
+	texture(NULL),
+	texture_width(0), texture_height(0)
 	{
-		mTexture = NULL;
-		Free();
+		
 	}
 
-	BaseTexture::BaseTexture(const BaseTexture& source)
+	BaseTexture::BaseTexture(const BaseTexture& Source)
 	{
-		const_cast<BaseTexture&>(source).MoveControlRightTo(this);
+		const_cast<BaseTexture&>(Source).MoveControlRightTo(this);
+	}
+
+	BaseTexture& BaseTexture::operator=(BaseTexture& Source)
+	{
+		Source.MoveControlRightTo(this);
+		return *this;
+	}
+
+	void BaseTexture::Free(void)
+	{
+		if (texture)
+		{
+			SDL_DestroyTexture(texture);
+			texture = NULL;
+		}
+
+		texture_width = 0;
+		texture_height = 0;
 	}
 
 	BaseTexture::~BaseTexture()
 	{
-		//Deallocate
 		Free();
 	}
 
-	bool BaseTexture::CreateFromFile(std::string path)
+	bool BaseTexture::LoadromFile(const char* FilePath)
 	{
-		bool success = true;
-
-		//Get rid of preexisting texture
+		bool success(true);
+		
+		// 清除已经存在的纹理
 		Free();
 
-		//The final texture
-		SDL_Texture* newTexture = NULL;
+		// 加载纹理
+		SDL_Surface *new_surface = IMG_Load(FilePath);
 
-		//Load image at specified path
-		SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-		if( loadedSurface == NULL )
+		if (new_surface == NULL)
 		{
-			std::string err = "无法读取纹理\""+path+"\"";
-			error_out(err);
+			error_out("BaseTexture::LoadromFile - 无法从\""+std::string(FilePath)+"\"读取纹理");
 			success = false;
 		}
 		else
 		{
-			//Create texture from surface pixels
-			newTexture = SDL_CreateTextureFromSurface( device.display.render, loadedSurface );
-			if( newTexture == NULL )
+			texture = SDL_CreateTextureFromSurface(device.display.render, new_surface);
+
+			if (texture == NULL)
 			{
-				std::string err = "无法从\""+path+"\"创建纹理! ";
-				error_out(err);
+				error_out("BaseTexture::LoadromFile - 无法用表面创建纹理");
 				success = false;
 			}
 			else
 			{
-				//Get image dimensions
-				mWidth = loadedSurface->w;
-				mHeight = loadedSurface->h;
+				texture_width = new_surface->w;
+				texture_height = new_surface->h;
 			}
 
-			//Get rid of old loaded surface
-			SDL_FreeSurface( loadedSurface );
+			// 释放表面
+			SDL_FreeSurface(new_surface);
 		}
 
-		SetBlendMode(SDL_BLENDMODE_NONE);
-
-		//Return success
-		mTexture = newTexture;
 		return success;
 	}
 
-	bool BaseTexture::CreateFromRenderedText(TTF_Font* font, const char* textureText, SDL_Color textColor )
+	bool BaseTexture::LoadFromTextUTF8(TTF_Font* Font, const char* Text, SDL_Color Color)
 	{
-		//Get rid of preexisting texture
+		bool success(true);
+
+		// 清除已经存在的纹理
 		Free();
 
-		// case 1
-		SDL_Surface* textSurface = TTF_RenderUTF8_Blended(font, textureText, textColor);
+		SDL_Surface *new_surface = TTF_RenderUTF8_Blended(Font, Text, Color);
 
-		// case 2
-		//SDL_Color text_background_color_key = {TextColorKeyR, TextColorKeyG, TextColorKeyB, 0xFF};
-		//SDL_Surface* textSurface = TTF_RenderUTF8_Shaded(font, textureText, textColor, text_background_color_key);
-
-		// case 3
-		//SDL_Surface* textSurface = TTF_RenderUTF8_Solid(font, textureText, textColor);
-
-		if( textSurface == NULL )
+		if (new_surface == NULL)
 		{
-			long address;
-			char buff[255];
-			sprintf(buff, "%p 文本:[%s]", &address, textureText);
-			error_out("BaseTexture::CreateFromRenderedText -- 无法用文字"+std::string(textureText)+"获得表面(surface)\n目标纹理地址:" + buff);
+			error_out("BaseTexture::LoadFromTextUTF8 - 用\""+std::string(Text)+"\"创建文字表面");
+			success = false;
 		}
 		else
 		{
-			// case 2
-			// 设置颜色值
-			//if(SDL_SetColorKey(textSurface, SDL_TRUE, SDL_MapRGB(textSurface->format, TextColorKeyR, TextColorKeyG, TextColorKeyB)) != 0)
-			//{
-			//	error_out("BaseTexture::CreateFromRenderedText - 无法设置颜色值");
-			//}
+			texture = SDL_CreateTextureFromSurface(device.display.render, new_surface);
 
-			//Create texture from surface pixels
-			mTexture = SDL_CreateTextureFromSurface( device.display.render, textSurface );
-
-			if( mTexture == NULL )
+			if (texture == NULL)
 			{
-				error_out("BaseTexture::CreateFromRenderedText -- 无法用表面(surfac)创建纹理(texture)");
+				error_out("BaseTexture::LoadFromTextUTF8 - 无法用表面创建纹理");
+				success = false;
 			}
 			else
 			{
-				//Get image dimensions
-				mWidth = textSurface->w;
-				mHeight = textSurface->h;
+				texture_width = new_surface->w;
+				texture_height = new_surface->h;
 			}
 
-			//Get rid of old surface
-			SDL_FreeSurface( textSurface );
+			// 释放表面
+			SDL_FreeSurface(new_surface);
 		}
 
-		//Return success
-		return mTexture != NULL;
+		return success;
 	}
 
-	bool BaseTexture::CreateTargetTexture(int width, int height)
+	bool BaseTexture::CreateTargetAbleTexture(int Width, int Height)
 	{
-		//Free();
+		bool success(true);
 
-		//Create uninitialized texture
-		mTexture = SDL_CreateTexture( device.display.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height );
-		if( mTexture == NULL )
-		{
-			printf( "Unable to create blank texture! SDL Error: %s\n", SDL_GetError() );
-		}
-		else
-		{
-			mWidth = width;
-			mHeight = height;
-		}
-
-		return mTexture != NULL;
-	}
-
-	bool BaseTexture::CreateLockAbleTexture(int width, int height)
-	{
+		// 释放已经存在的纹理
 		Free();
 
-		//Create uninitialized texture
-		mTexture = SDL_CreateTexture( device.display.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height );
-		if( mTexture == NULL )
+		texture = SDL_CreateTexture( device.display.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, Width, Height );
+		if( texture == NULL )
 		{
-			printf( "Unable to create blank texture! SDL Error: %s\n", SDL_GetError() );
+			error_out("BaseTexture::CreateTargetAbleTexture - 无法创建纹理");
+			success = false;
 		}
 		else
 		{
-			mWidth = width;
-			mHeight = height;
+			texture_width = Width;
+			texture_height = Height;
 		}
 
-		return mTexture != NULL;
+		return success;
 	}
 
-	bool BaseTexture::CreateUnlockAbleTexture(int width, int height)
+	bool BaseTexture::CreateLockAbleTexture(int Width, int Height)
 	{
+		bool success(true);
+
+		// 释放已经存在的纹理
 		Free();
 
-		//Create uninitialized texture
-		mTexture = SDL_CreateTexture( device.display.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, width, height );
-		if( mTexture == NULL )
+		texture = SDL_CreateTexture( device.display.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, Width, Height );
+		if( texture == NULL )
 		{
-			printf( "Unable to create blank texture! SDL Error: %s\n", SDL_GetError() );
+			error_out("BaseTexture::CreateLockAbleTexture - 无法创建纹理");
+			success = false;
 		}
 		else
 		{
-			mWidth = width;
-			mHeight = height;
+			texture_width = Width;
+			texture_height = Height;
 		}
 
-		return mTexture != NULL;
+		return success;
+	}
+
+	bool BaseTexture::CreateUnlockAbleTexture(int Width, int Height)
+	{
+		bool success(true);
+
+		// 释放已经存在的纹理
+		Free();
+
+		texture = SDL_CreateTexture( device.display.render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, Width, Height );
+		if( texture == NULL )
+		{
+			error_out("BaseTexture::CreateUnlockAbleTexture - 无法创建纹理");
+			success = false;
+		}
+		else
+		{
+			texture_width = Width;
+			texture_height = Height;
+		}
+
+		return success;
+	}
+
+	void BaseTexture::ChangeAsRenderTarget()
+	{
+		if(SDL_SetRenderTarget(device.display.render, texture) != 0)
+		{
+			error_out( "BaseTexture::SetAsRenderTarget - 无法重定向渲染目标!");
+		}
+	}
+
+	BaseTexture& BaseTexture::ChangeAlpha(uint8_t Alpha)
+	{
+		SDL_SetTextureAlphaMod(texture, Alpha);
+		return *this;
+	}
+
+	BaseTexture& BaseTexture::ChangeColorModulation(Uint8 red, Uint8 green, Uint8 blue)
+	{
+		SDL_SetTextureColorMod( texture, red, green, blue );
+		return *this;
+	}
+
+	BaseTexture& BaseTexture::ChangeBlendMode(SDL_BlendMode blending)
+	{
+		SDL_SetTextureBlendMode( texture, blending );
+		return *this;
+	}
+
+	BaseTexture& BaseTexture::GetSize(int &Width, int &Height)
+	{
+		Width = texture_width;
+		Height = texture_height;
+		return *this;
+	}
+
+	BaseTexture& BaseTexture::GetSizeWidth(int &Width)
+	{
+		Width = texture_width;
+		return *this;
+	}
+
+	BaseTexture& BaseTexture::GetSizeHeight(int &Height)
+	{
+		Height = texture_height;
+		return *this;
+	}
+
+	void BaseTexture::Render(int X, int Y)
+	{
+		SDL_Rect ts = {0,0,texture_width, texture_height};
+		SDL_Rect td = {X,Y,texture_width, texture_height};
+
+		SDL_RenderCopy( device.display.render, texture, &ts, &td);
+	}
+
+	void BaseTexture::Render(int X, int Y, float Scale)
+	{
+		SDL_Rect ts = {0,0,texture_width, texture_height};
+		SDL_Rect td = {X,Y,texture_width*Scale, texture_height*Scale};
+
+		SDL_RenderCopy( device.display.render, texture, &ts, &td);
+	}
+
+	void BaseTexture::Render(const SDL_Rect& SourceRect, const SDL_Rect& DestRect)
+	{
+		SDL_RenderCopy( device.display.render, texture, &SourceRect, &DestRect);
+	}
+
+	void BaseTexture::RenderEx(const SDL_Rect& SourceRect, const SDL_Rect& DestRect, const double Angle, SDL_Point& Center, SDL_RendererFlip FlipMod)
+	{
+		SDL_RenderCopyEx(device.display.render, texture,
+			&SourceRect, &DestRect,
+			Angle, &Center, FlipMod);
 	}
 
 	void BaseTexture::MoveControlRightTo(BaseTexture *new_controler)
 	{
 		if(new_controler != this)
 		{
+			// 清空原有数据
+			new_controler->Free();
+
 			// 传递数据
-			new_controler->mTexture = mTexture;
-			new_controler->mWidth = mWidth;
-			new_controler->mHeight = mHeight;
+			new_controler->texture = this->texture;
+			new_controler->texture_width = this->texture_width ;
+			new_controler->texture_height = this->texture_height;
 
 			// 清除控制权
-			mTexture = NULL;
+			this->texture = NULL;
 			Free();
 		}
 	}
 
-	void BaseTexture::Free()
+	int BaseTexture::GetWidth(void)
 	{
-		//Free texture if it exists
-		if( mTexture != NULL )
-		{
-			SDL_DestroyTexture( mTexture );
-		}
-
-		mTexture = NULL;
-		mWidth = 0;
-		mHeight = 0;
+		return texture_width;
 	}
 
-	void BaseTexture::SetColor( Uint8 red, Uint8 green, Uint8 blue )
+	int BaseTexture::GetHeight(void)
 	{
-		//Modulate texture rgb
-		SDL_SetTextureColorMod( mTexture, red, green, blue );
+		return texture_height;
 	}
 
-	void BaseTexture::SetBlendMode( SDL_BlendMode blending )
-	{
-		//Set blending function
-		SDL_SetTextureBlendMode( mTexture, blending );
-	}
-
-	void BaseTexture::SetAlpha( Uint8 alpha )
-	{
-		//Modulate texture alpha
-		SDL_SetTextureAlphaMod( mTexture, alpha );
-	}
-
-	void BaseTexture::SetAsRenderTarget()
-	{
-		if (mTexture)
-		{
-			if(SDL_SetRenderTarget(device.display.render, mTexture) != 0)
-			{
-				long address;
-				char buff[16];
-				sprintf(buff, "%p", &address);
-				error_out( "BaseTexture::SetAsRenderTarget - 无法重定向渲染目标!\n"+std::string("目标纹理地址:") + buff);
-			}
-		}
-
-	}
-
-	void BaseTexture::Draw(int X, int Y)
-	{
-		SDL_Rect ts = {0,0,mWidth, mHeight};
-		SDL_Rect td = {X,Y,mWidth, mHeight};
-
-		//Render to screen
-		SDL_RenderCopy( device.display.render, mTexture, &ts, &td);
-	}
-
-	void BaseTexture::Draw(int X, int Y, float Rate)
-	{
-		SDL_Rect ts = {0,0,mWidth, mHeight};
-		SDL_Rect td = {X,Y,mWidth*Rate, mHeight*Rate};
-
-		//Render to screen
-		SDL_RenderCopy( device.display.render, mTexture, &ts, &td);
-	}
-
-
-	SDL_Texture* BaseTexture::GetTexture(void){return mTexture;}
-	int BaseTexture::GetWidth(void){return mWidth;}
-	int BaseTexture::GetHeight(void){return mHeight;}
-
-	// 复制函数
-	BaseTexture& BaseTexture::operator=(BaseTexture& source)
-	{
-		source.MoveControlRightTo(this);
-		return *this;
-	}
-
-	void BaseTexture::Render(const SDL_Rect& SourceRect, const SDL_Rect& DestRect)
-	{
-		SDL_RenderCopy(device.display.render, mTexture,
-			&SourceRect, &DestRect);
-	}
-
-	void BaseTexture::RenderEx(const SDL_Rect& SourceRect, const SDL_Rect& DestRect, const double Angle, SDL_Point& Center, SDL_RendererFlip FlipMod)
-	{
-		SDL_RenderCopyEx(device.display.render, mTexture,
-			&SourceRect, &DestRect,
-			Angle, &Center, FlipMod);
-	}
 
 }
-
-
-
-

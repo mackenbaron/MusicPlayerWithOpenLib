@@ -5,7 +5,7 @@
 
 /////////////////////////////////
 // 调试功能的开启
-#define CodeDebug
+//#define CodeDebug
 
 // 文本颜色不能使用以下值!!!
 //#define TextColorKeyR 0xF

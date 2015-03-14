@@ -8,10 +8,24 @@ namespace Orz
 {
 	struct InputButton
 	{
-		InputButton():is_button_down(0), last_time(0) {};
+		InputButton():is_button_down(0),
+		sign_start_time(0), sign_end_time(0),
+		is_last_down(0), is_last_short_sign(true),
+		is_mouse_over(false)
+		{};
+
+		void Contact(bool IsButtonDown);
 
 		bool is_button_down;
-		unsigned int last_time;
+
+		// 消息 and 状态
+		ControlMessage control_message;
+		ControlState control_state;
+
+		// DoContact 记录用消息
+		unsigned long sign_start_time, sign_end_time;
+		bool is_last_down, is_last_short_sign;
+		bool is_mouse_over;
 	};
 
 	class _DeviceInput
@@ -32,6 +46,7 @@ namespace Orz
 		// 用户获取输入
 		bool GetButton(InputKeyCode which_key);
 		int GetMouseWheel();
+		ControlMessage GetButtonMessage(InputKeyCode which_key);
 
 	private:
 		int mouse_x, mouse_y;

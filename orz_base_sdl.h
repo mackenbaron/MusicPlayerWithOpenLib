@@ -10,8 +10,8 @@ namespace Orz
 {
     class BaseSDL
     {
-		friend class _Platform;
 		friend class _Manager;
+		friend class _Platform;
 		friend class _Device;
 		friend class BaseTexture;
 
@@ -41,16 +41,18 @@ namespace Orz
         void DrawLine(const SDL_Color &c, int x1, int y1, int x2, int y2);
         void DrawLine(Uint8 r, Uint8 g, Uint8 b, int x1, int y1, int x2, int y2);
 
-		void DrawFillRect(const SDL_Color &c, SDL_Rect &fill_rect);
-		void DrawOutlineRect(const SDL_Color &c, SDL_Rect &outline_rect);
+		void DrawFillRect(const SDL_Color &c, const SDL_Rect &fill_rect);
+		void DrawOutlineRect(const SDL_Color &c, const SDL_Rect &outline_rect);
 
 		// 特殊绘制方案
 		// 绘制透明的纯色背景
-		void DrawAlphaSolidColor(SDL_Color &c, Uint8 alpha,SDL_Rect &dest_rect);
+		void DrawAlphaFillRect(const SDL_Color &c, Uint8 alpha, const SDL_Rect &dest_rect);
 
 		// 设置视口
-		void SetViewport(SDL_Rect &ViewportRect);
-		void SetViewportToDefault();
+		void SetClip(const SDL_Rect &ClipRect);
+		void SetClipToNull(void);
+		void SetViewport(const SDL_Rect &ViewportRect);
+		void SetViewportToDefault(void);
 
 	private:
 
@@ -61,7 +63,7 @@ namespace Orz
 		void Present(void);
 		bool DoTheThingsAfterCreateWindow();
 
-        // SDL 窗口
+		// SDL 窗口
         SDL_Window *window;
 
 		// 特殊绘制方案纯色背景用到的纹理

@@ -5,17 +5,17 @@
 
 namespace Orz
 {
-    Font::Font():font(0)
+    BaseFont::BaseFont():font(0)
     {
         Free();
     }
 
-    Font::~Font()
+    BaseFont::~BaseFont()
     {
         Free();
     }
 
-    void Font::Free()
+    void BaseFont::Free()
     {
 		if (font)
 		{
@@ -24,7 +24,7 @@ namespace Orz
 		}
     }
 
-    bool Font::CreateFont(const char* FontName, int FontSize)
+    bool BaseFont::CreateFont(const char* FontName, int FontSize)
     {
         Free();
         font = TTF_OpenFont(FontName, FontSize);
@@ -39,23 +39,19 @@ namespace Orz
         return true;
     }
 
-	void Font::ChangeFontSize(int FontSize)
+	void BaseFont::ChangeFontSize(int FontSize)
 	{
 		CreateFont(font_name.c_str(), FontSize);
 	}
 
-	bool Font::CreateText(const char* Text, const Color& c)
+	bool BaseFont::CreateTextUTF8(const char* Text, const Color& c)
 	{
-		if(!font)
-		{
-			return false;
-		}
-
-		return image.CreateFromRenderedText(font, Text, c);
+		return image.LoadFromTextUTF8(font, Text, c);
 	}
 
-    inline Texture* Font::GetTexture()
-    {
-        return image.GetTexture();
-    }
+	void BaseFont::GetTextSizeUTF8(const char *Text, int &Width, int &Height)
+	{
+		TTF_SizeUTF8(font, Text, &Width, &Height);
+	}
+
 }

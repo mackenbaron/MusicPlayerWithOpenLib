@@ -18,10 +18,10 @@ namespace Program
 	class PlayList
 	{
 	public:
-		bool LoadPlayListM3u(const char *Path);
+		bool LoadPlayListM3u(const char *LoadPath);
+		bool SaveSongListM3u(const char *SavePath);
 		void PushBackEntryGBK(const char *Path);
 		std::vector<SongInformation>& GetSongList();
-
 	private:
 		std::vector<SongInformation> song_list;
 	};

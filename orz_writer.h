@@ -3,73 +3,81 @@
 
 #include "orz_font.h"
 #include "orz_base_math.h"
-#include <SDL_ttf.h>
+#include "orz_base_ui.h"
 #include <vector>
 
 namespace Orz
 {
-    struct LineInformation
-    {
-        void Free()
-        {
-            text.clear();
-            w = h =0;
-        }
-        LineInformation():w(0), h(0), texture(){}
-        std::string text;
-		BaseTexture texture;
-        int w;
-        int h;
-    };
+	struct LineText: public BaseUi
+	{
+	public:
+		LineText();
 
-    class Writer
+		// 修改属性
+		LineText& ChangeTextUTF8(BaseFont &Font, const char *Text);		// 此操作需要重新渲染纹理
+		LineText& ChangeColor(BaseFont &Font, const Color &NewColor);	// 此操作需要重新渲染纹理
+		LineText& ChangeTextPositionPercent(float PercentX, float PercentY);
+		
+		// 获取属性
+		LineText& GetText(std::string& ReceiveText);
+
+		// 释放本行的内容
+		void DoFree();
+
+	private:
+		friend class Writer;
+
+		// 绘制
+		void DoDraw(const Rect& DrawRect);
+		void DoChangeAlpha(unsigned char Alpha);
+
+		// 根据数据重新创建纹理
+		void ReloadTexture(BaseFont &Font);
+
+		// 这一行的文字
+		std::string line_text;
+		Color line_text_color;
+		BaseTexture image;
+
+		// 文字位置
+		float text_percent_x, text_percent_y;
+	};
+
+    class Writer: public BaseUi
     {
     public:
         Writer();
-        bool CreateWriter(const char *FontName, const char *Text, int FontSize, Color FontColor, Rect DestRect);
+        bool CreateWriter(const char *WriterName, const char *FontName, const char *Text, int FontSize, Color FontColor, Rect DestRect);
 
-        // 以下操作可能需要重新渲染,略慢
-        Writer& ChangeText(const char *Text);
-        Writer& ChangeFontSize(int FontSize);
-        Writer& ChangeTextSize(int W, int H);
-
-		// 改变文本显示位置
-		Writer& ChangeTextPosition(int X, int Y);
-
-		// 设置透明度/可见度(0 -255)
-		// ( 0 - 不可见, 255 - 不透明)
-		Writer& ChangeAlpah(uint8_t Alpha);
+		// 改变属性
+		Writer& ChangeTextCenterPosition(float PrecentX, float PrecentY);
+		Writer& ChangeFontSize(int FontSize);		// 此操作需要重新渲染纹理
+        Writer& ChangeTextUTF8(const char *Text);	// 此操作需要重新渲染纹理
+		Writer& ChangeTextColor(const Color &NewColor);	// 此操作需要重新渲染纹理
 
 		// 得到数据
-		Writer& GetTextPosition(int &X, int &Y);
-		Writer& GetTextSize(int &W, int &H);
-
-        // 进行绘制
-        void Write();
-		void Write(int X, int Y);
-		void Write(float PercentX, float PercentY);
+		Writer& GetText(std::string& ReceiveText);
 
     private:
 		// 根据数据重新绘制纹理
-		void RerenderTexture();
+		void ReloadTexture();
 
+		void DoChangeSize(int Width, int Height);
+		void DoDraw(const Rect& DrawRect);
+		
         // 字体
-        Font font;
-
-        // 用户想要渲染到什么地方
-		Rect dest_rect;
+        BaseFont font;
 
         // 要渲染的文本
-        std::string text;
+        std::string writer_text;
 
-        // 要渲染的每一行的文本
-        std::vector<LineInformation> every_line;
+		// 颜色
+		Color writer_color;
+		float writer_text_center_x;
+		float writer_text_center_y;
 
         // 根据文本及字体创建的最终的文本纹理的宽高
-        int text_texture_width, text_texture_height;
-
-		// 文本透明度
-		uint8_t alpha;
+        int text_texture_total_width, text_texture_total_height;
     };
 }
 

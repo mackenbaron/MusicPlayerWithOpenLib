@@ -1,26 +1,29 @@
 
 #include "orz_base_element.h"
 #include "orz_config.h"
-#include "orz_base_private_resource.h"
+#include "orz_base_public_resource.h"
 
 #ifdef CodeDebug
-#include <iostream>
+	#include <iostream>
 #endif
 
 namespace Orz
 {
+	// 错误处理
+	ElementError error_element;
+
+	// -----------------------
 	BaseElement::BaseElement(ElementType Type, int X, int Y, int Width, int Height, float Distance):
 	element_type(Type),
 	x(X), y(Y), width(Width), height(Height),
-	distance(Distance),
+	deep_distance(Distance),
 	is_show(true),
+	is_clip(false),
 	element_alpha(255),
-	last_down_time(0), last_up_time(0),
-	is_last_down(0),
-	in_judge_click(0), in_judge_double_click(0), in_judge_const_down(0),
+	element_render_style(ELEMENT_RENDER_STYLE_ADAPT),
 	parent(NULL)
 	{
-		ContactReset();
+		// 不要在这里调用如何自己的方法,否则易造成调用纯虚函数的错误!!!
 	}
 
 	BaseElement::~BaseElement()
@@ -28,279 +31,14 @@ namespace Orz
 
 	}
 
-	void BaseElement::DoContactReset(void)
+	void BaseElement::DoFree(void)
 	{
-		element_message = ELEMENT_MESSAGE_MOUSE_OUT;
-		element_state = ELEMENT_STATE_MOUSE_OUT;
-		is_mouse_over = false;
-
-		last_down_time = 0, last_up_time = 0;
-		is_last_down = false;
-		in_judge_click = in_judge_double_click = in_judge_const_down = false;
-		curr_time = 0, delta_time = 0;
-	}
-
-	void BaseElement::DoContact(int MouseX, int MouseY, bool IsMouseDown)
-	{
-		if (is_show==false)
+		for (int i = 0; i < children.size(); i++)
 		{
-			DoContactReset();
-			return;
+			delete children[i];
+			children[i] = NULL;
 		}
-
-		// 测试是否在元素内
-		if ( 0 <= MouseX && MouseX < width && 0 <= MouseY && MouseY <= height)
-			is_mouse_over = true;
-		else
-			is_mouse_over = false;
-
-		curr_time = SDL_GetTicks();
-		if(is_mouse_over) // 鼠标在控件之内
-		{
-			if(IsMouseDown)
-			{
-				if(is_last_down)// 上次按下了,这次也按下
-				{
-					if(in_judge_const_down) // 这是一个"持续按下"
-					{
-						// 记录本次按键
-						last_down_time = curr_time;
-						is_last_down = true;
-
-						element_message = ELEMENT_MESSAGE_MOUSE_CONST_DOWN;
-					}
-					else if(in_judge_click)// 正在判断"持续按下"
-					{
-						if((curr_time - last_up_time) > CLICK_DELTA_TIME) // 发送"持续按下"消息
-						{
-							in_judge_click = false;
-							in_judge_const_down = true;
-
-							// 记录本次按键
-							last_down_time = curr_time;
-							is_last_down = true;
-
-							element_message = ELEMENT_MESSAGE_MOUSE_CONST_DOWN;
-						}
-						else // 还是在判断单击
-						{
-							// 记录本次按键
-							last_down_time = curr_time;
-							is_last_down = true;
-
-							element_message = ELEMENT_MESSAGE_MOUSE_OVER;
-						}
-
-					}
-					else // 正在判断"双击"
-					{
-						// 记录本次按键
-						last_down_time = curr_time;
-						is_last_down = true;
-
-						element_message = ELEMENT_MESSAGE_MOUSE_OVER;
-					}
-				}
-				else // 上一次没按下,这次按下了
-				{
-					if(in_judge_double_click) // 发送"双击"消息
-					{
-						// 退出判断"单击"/"双击"状态
-						in_judge_click = false;
-						in_judge_double_click = true;
-
-						// 记录本次按键
-						last_down_time = curr_time;
-						is_last_down = true;
-
-						element_message = ELEMENT_MESSAGE_MOUSE_OVER;
-					}
-					else // 判断单击
-					{
-						// 进入判断"单击"状态
-						in_judge_click = true;
-
-						// 记录本次按键
-						last_down_time = curr_time;
-						is_last_down = true;
-
-						element_message = ELEMENT_MESSAGE_MOUSE_OVER;
-					}
-				}
-			}
-			else
-			{
-				if(is_last_down) // 上次按下了,这次没按下,刚刚一定在判断事件
-				{
-					if(in_judge_const_down) // 退出"持续按下"
-					{
-						// 退出判断状态
-						in_judge_const_down = false;
-
-						// 记录本次按键
-						last_up_time = curr_time;
-						is_last_down = false;
-
-						element_message = ELEMENT_MESSAGE_MOUSE_CONST_DOWN_END;// 发送持续按下结束消息
-					}
-					else if(in_judge_double_click)// 发送"双击"消息
-					{
-						// 退出判断状态
-						in_judge_double_click = false;
-
-						// 记录本次按键
-						last_up_time = curr_time;
-						is_last_down = false;
-
-						element_message = ELEMENT_MESSAGE_MOUSE_DOUBLE_CLICK;
-					}
-					else // 判断"单击"/"双击"
-					{
-						in_judge_double_click = true;
-
-						// 记录本次按键
-						last_up_time = curr_time;
-						is_last_down = false;
-
-						element_message = ELEMENT_MESSAGE_MOUSE_OVER;
-					}
-				}
-				else  // 上次没按下,这次没按下
-				{
-					if(in_judge_click) // 判断单击
-					{
-						if(curr_time - last_down_time > DOUBLE_CLICK_DELTA_TIME) // 发送"单击"消息
-						{
-							// 退出判断状态
-							in_judge_click = false;
-							in_judge_double_click = false;
-
-							// 记录本次按键
-							last_up_time = curr_time;
-							is_last_down = false;
-
-							element_message = ELEMENT_MESSAGE_MOUSE_CLICK;
-						}
-						else
-						{
-							// 记录本次按键
-							last_up_time = curr_time;
-							is_last_down = false;
-
-							element_message = ELEMENT_MESSAGE_MOUSE_OVER;
-						}
-					}
-					else // 什么也没发生
-					{
-						// 记录本次按键
-						last_up_time = curr_time;
-						is_last_down = false;
-
-						element_message = ELEMENT_MESSAGE_MOUSE_OVER;
-					}
-				}
-			}
-		}
-		else // 鼠标在控件之外
-		{
-			if(is_last_down)
-			{
-				if(IsMouseDown) // 鼠标按下
-				{
-					if(in_judge_const_down||in_judge_click||in_judge_double_click) // 正在判断事件
-					{
-						// 记录本次按键
-						last_down_time = curr_time;
-						is_last_down = true;
-
-						element_message = ELEMENT_MESSAGE_MOUSE_OUT;
-					}
-				}
-				else // 鼠标没按下
-				{
-					if(in_judge_const_down) // 退出"持续按下"
-					{
-						// 退出判断状态
-						in_judge_const_down = false;
-						in_judge_double_click = false;
-						in_judge_click = false;
-
-						// 记录本次按键
-						//last_up_time = curr_time;
-						is_last_down = false;
-
-						element_message = ELEMENT_MESSAGE_MOUSE_CONST_DOWN_END;// 发送持续按下结束消息
-					}
-					else // 退出判断"单击"/"双击"
-					{
-						// 退出判断状态
-						in_judge_const_down = false;
-						in_judge_double_click = false;
-						in_judge_click = false;
-
-						// 记录本次按键
-						//last_up_time = curr_time;
-						is_last_down = false;
-
-						element_message = ELEMENT_MESSAGE_MOUSE_OUT;
-					}
-
-				}
-			}
-			else
-			{
-				// 退出判断状态
-				in_judge_const_down = false;
-				in_judge_double_click = false;
-				in_judge_click = false;
-
-				is_last_down = false;
-
-				element_message = ELEMENT_MESSAGE_MOUSE_OUT;
-			}
-		}
-
-		if(in_judge_click||in_judge_double_click||in_judge_const_down)
-		{
-			element_state = ELEMENT_STATE_MOUSE_DOWN;
-		}
-		else
-		{
-			if (is_mouse_over)
-			{
-				element_state = ELEMENT_STATE_MOUSE_OVER;
-			}
-			else
-			{
-				element_state = ELEMENT_STATE_MOUSE_OUT;
-			}
-		}
-
-	#ifdef CodeDebug
-		using namespace std;
-		switch(element_message)
-		{
-		case ELEMENT_MESSAGE_MOUSE_OVER:
-		case ELEMENT_MESSAGE_MOUSE_OUT:
-			break;
-		case ELEMENT_MESSAGE_FUNCTION_ERROR:
-			cout<<element_name<<":ERROR!"<<endl;
-			break;
-
-		case ELEMENT_MESSAGE_MOUSE_CONST_DOWN:
-			cout<<element_name<<":MOUSE_CONST_DOWN"<<endl;
-			break;
-		case ELEMENT_MESSAGE_MOUSE_CONST_DOWN_END:
-			cout<<element_name<<":MOUSE_CONST_DOWN_END"<<endl;
-			break;
-		case ELEMENT_MESSAGE_MOUSE_CLICK:
-			cout<<element_name<<":MOUSE_CLICK"<<endl;
-			break;
-		case ELEMENT_MESSAGE_MOUSE_DOUBLE_CLICK:
-			cout<<element_name<<":MOUSE_DOUBLE_CLICK"<<endl;
-			break;
-		}
-	#endif
+		children.clear();
 	}
 
 	void BaseElement::DoChangePosition(int X, int Y)
@@ -309,13 +47,36 @@ namespace Orz
 		y = Y;
 	}
 
+	void BaseElement::DoChangePositionAaccordToParent(float PrecentX, float PrecentY)
+	{
+		if (parent)
+		{
+			int parent_x, parent_y, parent_w, parent_h;
+			parent->GetPosition(parent_x, parent_y).GetSize(parent_w, parent_h);
+			x = (parent_w - width) * PrecentX + width;
+			y = (parent_h - height) * PrecentY + height;
+		}
+	}
+
+	void BaseElement::DoChangeSize(float Scale)
+	{
+		width *= Scale;
+		height *= Scale;
+	}
+
+	void BaseElement::DoChangeSize(float ScaleWidth, float ScaleHeight)
+	{
+		width *= ScaleWidth;
+		height *= ScaleHeight;
+	}
+
 	void BaseElement::DoChangeSize(int Width, int Height)
 	{
 		width = Width;
 		height = Height;
 	}
 
-	void BaseElement::DoChangeAlpha(uint8_t Alpha)
+	void BaseElement::DoChangeAlpha(unsigned char Alpha)
 	{
 		element_alpha = Alpha;
 	}
@@ -325,18 +86,19 @@ namespace Orz
 		element_render_style = RenderStyle;
 	}
 
-	void BaseElement::DoDraw(void)
-	{
-
-	}
-
-	void BaseElement::DoGetAbsoluteParentDrawRect(Rect &AbsoluteRect)
+	void BaseElement::DoGetAbsoluteClipDrawRect(Rect &AbsoluteRect)
 	{
 		// 两个矩形相减
-		// 这个矩形减去子节点的矩形
-		int this_x1 = x, this_y1 = y, this_x2 = x + width,  this_y2 = y + height;
-		int last_x1 = AbsoluteRect.x, last_y1 = AbsoluteRect.y,
-			last_x2 = AbsoluteRect.x + AbsoluteRect.w, last_y2 = AbsoluteRect.y + AbsoluteRect.h;
+		// 此节点减去传递上来的矩形
+		int this_x1 = x,
+			this_y1 = y,
+			this_x2 = x + width,
+			this_y2 = y + height;
+
+		int last_x1 = AbsoluteRect.x + x,
+			last_y1 = AbsoluteRect.y + y,
+			last_x2 = AbsoluteRect.x + x + AbsoluteRect.w,
+			last_y2 = AbsoluteRect.y + y + AbsoluteRect.h;
 
 		// 处理左右两边
 		if (last_x1 < this_x1)
@@ -350,7 +112,7 @@ namespace Orz
 		}
 
 		// 要绘制图形在元素之外
-		if (last_x2 < last_x1)
+		if (last_x2 <= last_x1)
 		{
 			AbsoluteRect.w = 0;
 			AbsoluteRect.h = 0;
@@ -370,7 +132,7 @@ namespace Orz
 				last_y2 = this_y2;
 			}
 
-			if (last_y2 < last_y1)
+			if (last_y2 <= last_y1)
 			{
 				AbsoluteRect.w = 0;
 				AbsoluteRect.h = 0;
@@ -383,12 +145,52 @@ namespace Orz
 		}
 	}
 
-	BaseElement* BaseElement::DoGetChildElement(const char *SearchName)
+	BaseElement* BaseElement::DoSearchChildren(const char *SearchName)
 	{
 		if (element_name == SearchName)
 			return this;
 		else
 			return NULL;
+	}
+
+	BaseElement* BaseElement::DoSearchChildThatHaveContact(void)
+	{
+		if (element_state == ELEMENT_STATE_CONTACT)
+		{
+			return this;
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	void BaseElement::DoGetMousePosition(int &MouseX, int &MouseY)
+	{
+		if (parent)
+		{
+			MouseX -= x;
+			MouseY -= y;
+		}
+		else
+		{
+			platform.GetMousePosition(MouseX, MouseY);
+		}
+	}
+
+	void BaseElement::FreeSub(BaseElement *element)
+	{
+		if (element)
+		{
+			// 子节点
+			for (int i = 0; i < element->children.size(); i++)
+			{
+				element->FreeSub(children[i]);
+			}
+
+			// 自己
+			element->DoFree();
+		}
 	}
 
 	void BaseElement::ContactResetSub(BaseElement *element)
@@ -399,22 +201,23 @@ namespace Orz
 			element->DoContactReset();
 
 			// 子节点
-			for (int i = 0; i < children.size(); i++)
+			for (int i = 0; i < element->children.size(); i++)
 			{
-				children[i]->ContactResetSub(children[i]);
+				element->ContactResetSub(element->children[i]);
 			}
 		}
 	}
 
-	void BaseElement::ContactSub(BaseElement *element, int MouseX, int MouseY, bool IsMouseDown)
+	void BaseElement::ContactSub(BaseElement *element)
 	{
 		if (element)
 		{
+
 			// 子节点
-			for (int i = 0; i < children.size(); i++)
+			for (int i = 0; i < element->children.size(); i++)
 			{
-				children[i]->ContactSub(children[i], MouseX - x, MouseY - y, IsMouseDown);
-				if (children[i]->GetState() != ELEMENT_STATE_MOUSE_OVER)
+				element->ContactSub(element->children[i]);
+				if (element->children[i]->GetElementState() == ELEMENT_STATE_CONTACT)
 				{
 					// 已经找到有消息的节点,停止递归
 					return;
@@ -422,7 +225,18 @@ namespace Orz
 			}
 
 			// 自己
-			element->DoContact(MouseX - x, MouseY - y, IsMouseDown);
+			element->DoContact();
+
+			//for (int i = element->children.size() - 1; i >= 0; i--)
+			//{
+			//	element->ContactSub(element->children[i]);
+			//	if (element->children[i]->GetElementState() == ELEMENT_STATE_CONTACT)
+			//	{
+			//		// 已经找到有消息的节点,停止递归
+			//		return;
+			//	}
+			//}
+
 		}
 	}
 
@@ -435,19 +249,41 @@ namespace Orz
 		}
 	}
 
-	void BaseElement::ChangeSizeSub(BaseElement *element, int Width, int Height)
+	void BaseElement::ChangePositionAaccordToParent(BaseElement *element, float PrecentX, float PrecentY)
 	{
 		if (element)
 		{
 			// 自己
-			float scale_w = (float)width/ Width,scale_h = (float)height/Height;
-			element->DoChangeSize(Width, Height);
+			element->DoChangePositionAaccordToParent(PrecentX, PrecentY);
+		}
+	}
+
+	void BaseElement::ChangeSizeSub(BaseElement *element, float ScaleWidth, float ScaleHeight)
+	{
+		if (element)
+		{
+			// 自己
+			element->DoChangeSize(ScaleWidth, ScaleHeight);
 
 			// 子节点
-			int ew, eh;
-			for (int i = 0; i < children.size(); i++)
+			for (int i = 0; i < element->children.size(); i++)
 			{
-				children[i]->GetSize(ew, eh).ChangeSizeSub(children[i], Width*scale_w, Height*scale_h);
+				element->ChangeSizeSub(element->children[i], ScaleWidth, ScaleHeight);
+			}
+		}
+	}
+
+	void BaseElement::ChangeSizeSub(BaseElement *element, float Scale)
+	{
+		if (element)
+		{
+			// 自己
+			element->DoChangeSize(Scale);
+
+			// 子节点
+			for (int i = 0; i < element->children.size(); i++)
+			{
+				element->ChangeSizeSub(element->children[i], Scale);
 			}
 		}
 	}
@@ -460,9 +296,9 @@ namespace Orz
 			element->DoChangeAlpha(Alpha);
 
 			// 子节点
-			for (int i = 0; i < children.size(); i++)
+			for (int i = 0; i < element->children.size(); i++)
 			{
-				children[i]->ChangeAlphaSub(children[i], Alpha);
+				element->ChangeAlphaSub(element->children[i], Alpha);
 			}
 		}
 	}
@@ -475,52 +311,138 @@ namespace Orz
 			element->DoChangeRenderStyle(RenderStyle);
 
 			// 子节点
-			for (int i = 0; i < children.size(); i++)
+			for (int i = 0; i < element->children.size(); i++)
 			{
-				children[i]->ChangeRenderStyleSub(children[i], RenderStyle);
+				element->ChangeRenderStyleSub(element->children[i], RenderStyle);
 			}
 		}
 	}
 
-	void BaseElement::GetAbsoluteParentDrawRectSub(BaseElement *element, Rect &AbsoluteRect)
+	void BaseElement::GetAbsoluteClipDrawRectSub(BaseElement *element, Rect &AbsoluteRect)
 	{
 		if (element)
 		{
-			element->DoGetAbsoluteParentDrawRect(AbsoluteRect);
-			GetAbsoluteParentDrawRectSub(element->parent, AbsoluteRect);
-		}
-	}
+			AbsoluteRect.x = element->x;
+			AbsoluteRect.y = element->y;
+			AbsoluteRect.w = element->width;
+			AbsoluteRect.h = element->height;
 
-	void BaseElement::DrawSub(BaseElement *element)
-	{
-		if (element)
-		{
-			// 自己
-			element->DoDraw();
-
-			// 子节点
-			for (int i = 0; i < children.size(); i++)
+			BaseElement *temp = element->parent;
+			while (temp)
 			{
-				children[i]->DrawSub(children[i]);
+				temp->DoGetAbsoluteClipDrawRect(AbsoluteRect);
+				temp = temp->parent;
 			}
 		}
 	}
 
-	BaseElement* BaseElement::GetChildElementSub(BaseElement *element, const char *SearchName)
+	void BaseElement::GetMousePositionSub(BaseElement *element, int &MouseX, int &MouseY)
+	{
+		if (element)
+		{
+			// 父辈
+			if (element->parent)
+			{
+				element->parent->GetMousePosition(MouseX, MouseY);
+			}
+
+			// 本体
+			element->DoGetMousePosition(MouseX, MouseY);
+		}
+	}
+
+	void BaseElement::DrawSub(BaseElement *element, Rect& DrawRect)
+	{
+		if (element)
+		{
+			if (element->IsShow())
+			{
+				DrawRect.x += element->x;
+				DrawRect.y += element->y;
+
+				if (element->IsClip())
+				{
+					Rect clip_rect;
+					element->GetAbsoluteClipDrawRect(clip_rect);
+					device.display.SetClip(clip_rect);
+					DrawRect.w = clip_rect.w;
+					DrawRect.h = clip_rect.h;
+
+					if (DrawRect.w > 0 && DrawRect.h >0)
+					{
+						// 自己
+						element->DoDraw(DrawRect);
+
+						//// 子节点
+						//for (int i = 0; i < element->children.size(); i++)
+						//{
+						//	Rect SubDrawRect = DrawRect;
+						//	element->DrawSub(element->children[i], SubDrawRect);
+						//}
+
+						// 子节点
+						for (int i = element->children.size() - 1; i >= 0 ; i--)
+						{
+							Rect sub_real_draw_rect = DrawRect;
+							element->DrawSub(element->children[i], sub_real_draw_rect);
+						}
+					}
+					device.display.SetClipToNull();
+
+
+#ifdef CodeDebug
+					// 画出外边框线条来
+					device.display.DrawOutlineRect(OriginColor, clip_rect);
+					Rect in_rect = {clip_rect.x+1, clip_rect.y+1, clip_rect.w+1, clip_rect.h+1};
+					device.display.DrawOutlineRect(OriginColor, in_rect);
+#endif
+				}
+				else
+				{
+					DrawRect.w = element->width;
+					DrawRect.h = element->height;
+
+					// 自己
+					element->DoDraw(DrawRect);
+
+					//// 子节点
+					//for (int i = 0; i < element->children.size(); i++)
+					//{
+					//	Rect SubDrawRect = DrawRect;
+					//	element->DrawSub(element->children[i], SubDrawRect);
+					//}
+
+					// 子节点
+					for (int i = element->children.size() - 1; i >= 0 ; i--)
+					{
+						Rect SubDrawRect = DrawRect;
+						element->DrawSub(element->children[i], SubDrawRect);
+					}
+
+#ifdef CodeDebug
+					// 画出外边框线条来
+					device.display.DrawOutlineRect(GreenColor, DrawRect);
+#endif
+				}
+			}
+		}
+	}
+
+	BaseElement* BaseElement::SearchChildrenSub(BaseElement *element, const char *SearchName)
 	{
 		BaseElement* temp = NULL;
 
 		if (element)
 		{
 			// 自己
-			temp = element->DoGetChildElement(SearchName);
+			temp = element->DoSearchChildren(SearchName);
 
 			if (temp == NULL)
 			{
 				// 继续搜索子节点
-				for (int i = 0; i < children.size(); i++)
+				for (int i = 0; i < element->children.size(); i++)
 				{
-					temp = children[i]->GetChildElementSub(children[i], SearchName);
+					temp = element->SearchChildrenSub(element->children[i], SearchName);
 					if (temp != NULL)
 					{
 						break;
@@ -530,6 +452,35 @@ namespace Orz
 		}
 
 		return temp;
+	}
+
+	BaseElement* BaseElement::SearchChildThatHaveContactSub(BaseElement *element)
+	{
+		BaseElement* temp = NULL;
+		if (element)
+		{
+			for (int i = 0; i < element->children.size(); i++)
+			{
+				temp = element->SearchChildThatHaveContactSub(element->children[i]);
+				if (temp != NULL)
+				{
+					break;
+				}
+			}
+
+			// 自己
+			if (temp == NULL)
+			{
+				temp = element->DoSearchChildThatHaveContact();
+			}
+		}
+		return temp;
+	}
+
+	BaseElement& BaseElement::Free(void)
+	{
+		FreeSub(this);
+		return *this;
 	}
 
 	BaseElement& BaseElement::Show()
@@ -546,7 +497,8 @@ namespace Orz
 
 	BaseElement& BaseElement::Draw(void)
 	{
-		DrawSub(this);
+		Rect AbsoluteRect = {x, y, width, height};
+		DrawSub(this, AbsoluteRect);
 		return *this;
 	}
 
@@ -556,9 +508,9 @@ namespace Orz
 		return *this;
 	}
 
-	BaseElement& BaseElement::Contact(int MouseX, int MouseY, bool IsMouseDown)
+	BaseElement& BaseElement::Contact()
 	{
-		ContactSub(this, MouseX, MouseY, IsMouseDown);
+		ContactSub(this);
 		return *this;
 	}
 
@@ -568,9 +520,55 @@ namespace Orz
 		return *this;
 	}
 
+	BaseElement& BaseElement::ChangePositionAaccordToParent(float PrecentX, float PrecentY)
+	{
+		ChangePositionAaccordToParent(this, PrecentX, PrecentY);
+		return *this;
+	}
+
+	BaseElement& BaseElement::ChangeSize(float ScaleWidth, float ScaleHeight)
+	{
+		ChangeSizeSub(this, ScaleWidth, ScaleHeight);
+		return *this;
+	}
+
 	BaseElement& BaseElement::ChangeSize(int Width, int Height)
 	{
-		ChangeSizeSub(this, Width, Height);
+		if (this)
+		{
+			DoChangeSize(Width, Height);
+		}
+
+		return *this;
+	}
+
+	BaseElement& BaseElement::ChangeSize(float Scale)
+	{
+		ChangeSizeSub(this, Scale);
+		return *this;
+	}
+
+	BaseElement& BaseElement::ChangeDistance(float Distance)
+	{
+		if (this)
+		{
+			deep_distance = Distance;
+
+			if (parent)
+			{
+				for (int i = 0; i < parent->children.size(); i++)
+				{
+
+					if (parent->children[i] == this)
+					{
+						BaseElement *temp_parent = parent;
+						temp_parent->ChildrenErease(i);
+						temp_parent->ChildrenPushBack(this);
+						break;
+					}
+				}
+			}
+		}
 		return *this;
 	}
 
@@ -628,12 +626,12 @@ namespace Orz
 		return *this;
 	}
 
-	ElementMessage BaseElement::GetMessage(void)
+	ElementMessage BaseElement::GetElementMessage(void)
 	{
 		return element_message;
 	}
 
-	ElementState BaseElement::GetState(void)
+	ElementState BaseElement::GetElementState(void)
 	{
 		return element_state;
 	}
@@ -642,15 +640,14 @@ namespace Orz
 	{
 		if (this)
 		{
-			BaseElement *temp = parent;
-			X = x;
-			Y = y;
-			int temp_x, temp_y;
+			X = this->x;
+			Y = this->y;
+
+			BaseElement *temp = this->parent;
 			while (temp)
 			{
-				temp->GetPosition(temp_x, temp_y);
-				X += temp_x;
-				Y += temp_y;
+				X += temp->x;
+				Y += temp->y;
 				temp = temp->parent;
 			}
 		}
@@ -658,21 +655,16 @@ namespace Orz
 		return *this;
 	}
 
-	BaseElement& BaseElement::GetAbsoluteParentDrawRect(Rect &AbsoluteRect)
+	BaseElement& BaseElement::GetAbsoluteClipDrawRect(Rect &AbsoluteRect)
 	{
-		if (parent)
-		{
-			AbsoluteRect.x = parent->x;
-			AbsoluteRect.y = parent->y;
-			AbsoluteRect.w = parent->width;
-			AbsoluteRect.h = parent->height;
+		GetAbsoluteClipDrawRectSub(this, AbsoluteRect);
+	
+		return *this;
+	}
 
-			if (parent->parent)
-			{
-				GetAbsoluteParentDrawRectSub(parent, AbsoluteRect);
-			}
-		}
-
+	BaseElement& BaseElement::GetMousePosition(int &MouseX, int &MouseY)
+	{
+		GetMousePositionSub(this, MouseX, MouseY);
 		return *this;
 	}
 
@@ -681,7 +673,17 @@ namespace Orz
 		return is_show;
 	}
 
-	BaseElement& BaseElement::GetChildElement(int Position)
+	bool BaseElement::ChildrenEmpty(void)
+	{
+		return children.empty();
+	}
+
+	int BaseElement::ChildrenSize()
+	{
+		return children.size();
+	}
+
+	BaseElement& BaseElement::Children(int Position)
 	{
 		if (0 <= Position && Position < children.size())
 		{
@@ -693,33 +695,89 @@ namespace Orz
 		}
 	}
 
-	BaseElement& BaseElement::GetChildElement(const char *SearchName)
+	BaseElement& BaseElement::SearchChildren(const char *SearchName)
 	{
-		BaseElement *temp = GetChildElementSub(this, SearchName);
+		BaseElement *temp = SearchChildrenSub(this, SearchName);
 
 		if (temp != NULL)
-			return *this;
+			return *temp;
+		else
+		{
+#ifdef CodeDebug
+			error_out("没有找到"+std::string(SearchName));
+#endif
+			return error_element;
+		}
+	}
+
+	BaseElement& BaseElement::SearchChildThatHaveContact(void)
+	{
+		BaseElement *temp = SearchChildThatHaveContactSub(this);
+
+		if (temp != NULL)
+			return *temp;
 		else
 			return error_element;
 	}
 
-	int BaseElement::GetChildrenSize()
-	{
-		return children.size();
-	}
-
-	BaseElement& BaseElement::AddChildElement(BaseElement* NewChildElement)
+	BaseElement& BaseElement::ChildrenPushBack(BaseElement* NewChildElement)
 	{
 		int i(0);
 
 		for (i = 0; i < children.size(); i++)
 		{
-			if (NewChildElement->distance < children[i]->distance)
+			if (NewChildElement->deep_distance > children[i]->deep_distance)
 				break;
 		}
 
+		NewChildElement->parent = this;
 		children.insert(children.begin() + i, NewChildElement);
 
+
+		return *this;
+	}
+
+	BaseElement& BaseElement::ChildrenInsert(int Position, BaseElement* NewChildElement)
+	{
+		if ((0 <= Position)&&(Position <= ChildrenSize()))
+		{
+			NewChildElement->parent = this;
+			children.insert(children.begin() + Position, NewChildElement);
+		}
+		return *this;
+	}
+
+	BaseElement& BaseElement::ChildrenErease(int Position)
+	{
+		if (0 <= Position && Position < children.size())
+		{
+			children[Position]->parent = NULL;
+			children.erase(children.begin() + Position);
+		}
+
+		return *this;
+	}
+
+	bool BaseElement::IsClip()
+	{
+		return is_clip;
+	}
+
+	BaseElement& BaseElement::ChangeToClip()
+	{
+		if (this)
+		{
+			this->is_clip = true;
+		}
+		return *this;
+	}
+
+	BaseElement& BaseElement::ChangeToNoClip()
+	{
+		if (this)
+		{
+			this->is_clip = false;
+		}
 		return *this;
 	}
 

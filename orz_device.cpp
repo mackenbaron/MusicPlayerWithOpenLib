@@ -1,6 +1,6 @@
 
 #include "orz_base_public_resource.h"
-#include "orz_base_private_resource.h"
+//#include "orz_base_private_resource.h"
 #include "orz_device.h"
 #include "orz_base_time.h"
 

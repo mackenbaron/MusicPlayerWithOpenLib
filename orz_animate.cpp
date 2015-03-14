@@ -7,193 +7,35 @@
 namespace Orz
 {
 	Animate::Animate():
-	name(""),
-	width(0),
-	height(0),
-	is_loop(0), is_show(0),
-	total_time(0), curr_time(0), total_frame(0), curr_frame(0), begin_time(0)
+	BaseUi(ELEMENT_TYPE_UI_ANIMATE, 0.0f),
+	is_use_angle_and_center_to_draw(false),
+	is_loop(true),
+	total_time(0), total_frame(0), curr_frame(0), begin_time(0),
+	solo_frame_width(0), solo_frame_height(0),
+	animate_angle(0.0f), animate_flip_mode(FLIP_MODE_NONE)
+	{
+		animate_center.x = 0.5f;
+		animate_center.y = 0.5f;
+	}
+
+	void Animate::DoContact(void)
 	{
 	}
 
-	Animate::Animate(const char *NamePath)
-	{
-		LoadAnimate(NamePath);
-	}
-
-	Animate::~Animate()
-	{
-	}
-
-	Animate& Animate::Contact(void)
-	{
-		curr_time = GetTickTime();
-		return *this;
-	}
-
-	void Animate::ContactReset(void)
+	void Animate::DoContactReset(void)
 	{
 		begin_time = 0;
 	}
 
-	void Animate::SetAlpha(int Alpha)
+	void Animate::DoChangeAlpha(uint8_t Alpha)
 	{
-		image.SetAlpha(Alpha);
+		image.ChangeAlpha(Alpha);
 	}
 
-    void Animate::Draw(int x, int y, float scale)
+    bool Animate::LoadAnimate(const char *AnimateName, const char* NamePath, const Rect &AnimateRect)
     {
-        curr_frame = total_frame * ((curr_time - begin_time) % total_time) / total_time;
-
-        source_rect.x = width * curr_frame;
-        source_rect.y = 0;
-        source_rect.w = width;
-        source_rect.h = height;
-
-        dest_rect.x = x;
-        dest_rect.y = y;
-        dest_rect.w = scale * width;
-        dest_rect.h = scale * height;
-
-		image.Render(source_rect, dest_rect);
-    }
-
-	void Animate::Draw(Rect &DestRect)
-	{
-		float scale;
-		if((float)DestRect.w/DestRect.h > (float)width/height)
-		{
-			scale = (float)DestRect.h/height;
-			dest_rect.y = DestRect.y;
-
-			dest_rect.x = DestRect.x + (DestRect.w - scale * width)/2;
-		}
-		else
-		{
-			scale = (float)DestRect.w/width;
-			dest_rect.x = DestRect.x;
-
-			dest_rect.y = DestRect.y + (DestRect.h - scale * height)/2;
-		}
-
-		dest_rect.w = scale * width;
-		dest_rect.h = scale * height;
-
-		curr_frame = total_frame * ((curr_time - begin_time) % total_time) / total_time;
-
-		source_rect.x = width * curr_frame;
-		source_rect.y = 0;
-		source_rect.w = width;
-		source_rect.h = height;
-
-		image.Render(source_rect, dest_rect);
-
-		#ifdef CodeDebug
-			device.display.DrawOutlineRect(RedColor, DestRect);
-		#endif
-	}
-
-	void Animate::DrawFill(Rect &DestRect)
-	{
-		//float scale;
-		//if((float)DestRect.w/DestRect.h < (float)width/height)
-		//{
-		//	scale = (float)DestRect.h/height;
-		//	dest_rect.y = DestRect.y;
-
-		//	dest_rect.x = DestRect.x + (DestRect.w - scale * width)/2;
-		//}
-		//else
-		//{
-		//	scale = (float)DestRect.w/width;
-		//	dest_rect.x = DestRect.x;
-
-		//	dest_rect.y = DestRect.y + (DestRect.h - scale * height)/2;
-		//}
-
-		//dest_rect.w = scale * width;
-		//dest_rect.h = scale * height;
-
-		//curr_frame = total_frame * ((curr_time - begin_time) % total_time) / total_time;
-
-		//source_rect.x = width * curr_frame;
-		//source_rect.y = 0;
-		//source_rect.w = width;
-		//source_rect.h = height;
-
-		//SDL_RenderCopy(sdl.render, image.GetTexture(), &source_rect, &dest_rect);
-
-		//#ifdef CodeDebug
-		//SDL_SetRenderDrawColor(sdl.render, 255, 10, 20, 0xFF );		
-		//SDL_RenderDrawRect(sdl.render, &DestRect);
-		//#endif
-
-		float scale;
-		curr_frame = total_frame * ((curr_time - begin_time) % total_time) / total_time;
-		source_rect.x = width * curr_frame;
-		source_rect.y = 0;
-
-		if((float)DestRect.w/DestRect.h < (float)width/height)
-		{
-			scale = (float)height/DestRect.h;
-
-			source_rect.w = DestRect.w * scale;
-			source_rect.h = height;
-
-			source_rect.x += (width - DestRect.w * scale) * 0.5;
-		}
-		else
-		{
-			scale = (float)width/DestRect.w;
-
-			source_rect.w = width;
-			source_rect.h = DestRect.h * scale;
-
-			source_rect.y += (height - DestRect.h * scale) * 0.5;
-		}
-
-		image.Render(source_rect, DestRect);
-
-		#ifdef CodeDebug
-			device.display.DrawOutlineRect(RedColor, DestRect);
-		#endif
-	}
-
-    void Animate::DrawEx(int x, int y, float scale, float angle, Point &center, FlipMod flip_mod)
-    {
-        curr_frame = total_frame * ((curr_time - begin_time) % total_time) / total_time;
-
-        source_rect.x = width * curr_frame;
-        source_rect.y = 0;
-        source_rect.w = width;
-        source_rect.h = height;
-
-        dest_rect.x = x;
-        dest_rect.y = y;
-        dest_rect.w = scale * width;
-        dest_rect.h = scale * height;
-
-		image.RenderEx(source_rect, dest_rect, angle, center, (SDL_RendererFlip)flip_mod);
-    }
-
-	void Animate::DrawEx(int x, int y, float width_scale, float height_scale, float angle, Point& center)
-	{
-		curr_frame = total_frame * ((curr_time - begin_time) % total_time) / total_time;
-
-		source_rect.x = width * curr_frame;
-		source_rect.y = 0;
-		source_rect.w = width;
-		source_rect.h = height;
-
-		dest_rect.x = x;
-		dest_rect.y = y;
-		dest_rect.w = width_scale * width;
-		dest_rect.h = height_scale * height;
-
-		image.RenderEx(source_rect, dest_rect, angle, center, SDL_FLIP_NONE);
-	}
-
-    bool Animate::LoadAnimate(const char* NamePath)
-    {
+		bool success(true);
+		element_name = AnimateName;
         FILE *fp;
 
         fp = fopen(NamePath, "r");
@@ -201,106 +43,231 @@ namespace Orz
         if(fp == NULL)
         {
             error_out("Animate::LoadAnimate - 打开文件\""+std::string(NamePath)+"\"出错!");
-            return false;
+            success = false;
         }
+		else
+		{
+			char buff[255];
+			char var[255];
 
-        char buff[255];
-        char var[255];
+			// 读取纹理路径
+			if (fgets(buff, 254, fp) == NULL)
+			{
+				error_out("Animate::LoadAnimate - 打开文件\""+std::string(NamePath)+"\"出错!");
+				success = false;
+			}
+			else
+			{
+				// 获取纹理路径
+				for(int i=0; buff[i]&&i<254; i++)
+				{
+					if(buff[i] == '\"')
+					{
+						char* p = buff+i+1;
+						int j = 0;
+						for(; p[j]&&p[j]!='\"';j++)
+						{
+							var[j] = p[j];
+						}
+						var[j] = 0;
 
-        // 读取名称
-        fgets(buff, 254, fp);
-        for(int i=0; buff[i]&&i<254; i++)
-        {
-            if(buff[i] == '\"')
-            {
-                char* p = buff+i+1;
-                int j = 0;
-                for(; p[j]&&p[j]!='\"';j++)
-                {
-                    var[j] = p[j];
-                }
-                var[j] = 0;
+						break;
+					}
+				}
 
-                break;
-            }
-        }
-        name = var;
+				// 读取纹理
+				if(!image.LoadromFile(var))
+				{
+					error_out("BaseTexture::LoadFromFile - 创建纹理失败!");
+				}
 
+				// 读取总帧数
+				if (fgets(buff, 254, fp) == NULL)
+				{
+					// 就只有1帧
+					total_frame = 1;
+					total_time = 1000;
+				} 
+				else
+				{
 
-        // 读取纹理路径
-        fgets(buff, 254, fp);
-        for(int i=0; buff[i]&&i<254; i++)
-        {
-            if(buff[i] == '\"')
-            {
-                char* p = buff+i+1;
-                int j = 0;
-                for(; p[j]&&p[j]!='\"';j++)
-                {
-                    var[j] = p[j];
-                }
-                var[j] = 0;
+					for(int i=0; buff[i]&&i<254; i++)
+					{
+						if(buff[i] == '=')
+						{
+							sscanf(buff + i + 1, "%ld", &total_frame);
+						}
+					}
 
-                break;
-            }
-        }
+					// 读取总时间
+					if (fgets(buff, 254, fp) == NULL)
+					{
+						error_out("Animate::LoadAnimate - 打开文件\""+std::string(NamePath)+"\"出错!");
+						success = false;
+					}
+					else
+					{
+						for(int i=0; buff[i]&&i<254; i++)
+						{
+							if(buff[i] == '=')
+							{
+								sscanf(buff + i + 1, "%ld", &total_time);
+								if(total_time == 0)
+								{
+									total_time = 1000;
+									std::string err = "错误!:"+element_name+ "的播放时间为 0 (可能发生除零错误),错误, 已修改为1000ms!";
+									error_out(err);
+								}
+								break;
+							}
+						}
+					}// end 读取总时间
 
-        if(!image.CreateFromFile(var))
-        {
-            error_out("BaseTexture::LoadFromFile - 创建纹理失败!");
-            return false;
-        }
+				}// end 读取总帧数
 
+				// 根据帧数确定宽高
+				if (total_frame != 0)
+				{
+					solo_frame_width = image.GetWidth()/total_frame;
+					solo_frame_height = image.GetHeight();
+				}
+				else
+				{
+					width = image.GetWidth();
+				}
+				height = image.GetHeight();
 
-        // 读取总帧数
-        fgets(buff, 254, fp);
-        for(int i=0; buff[i]&&i<254; i++)
-        {
-            if(buff[i] == '=')
-            {
-                sscanf(buff + i + 1, "%ld", &total_frame);
-            }
-        }
-        // 确定宽高
-        width = image.GetWidth()/total_frame;
-        height = image.GetHeight();
+			}// end 读取纹理路径
+		}// end fopen
 
-
-
-        // 读取总时间
-        fgets(buff, 254, fp);
-        for(int i=0; buff[i]&&i<254; i++)
-        {
-            if(buff[i] == '=')
-            {
-                sscanf(buff + i + 1, "%ld", &total_time);
-                if(total_time == 0)
-                {
-                    total_time = 1000;
-                    std::string err = "错误!:"+name + "的播放时间为 0 (可能发生除零错误),错误, 已修改为1000ms!";
-                    error_out(err);
-                }
-                break;
-            }
-        }
+		ChangePosition(AnimateRect.x, AnimateRect.y);
+		ChangeSize(AnimateRect.w, AnimateRect.h);
 
         fclose(fp);
         return true;
     }
-    void Animate::SetBlendModeToAlpha()
+
+    Animate& Animate::ChangeBlendModeToNone()
     {
-        image.SetBlendMode(SDL_BLENDMODE_BLEND);
+		image.ChangeBlendMode(SDL_BLENDMODE_NONE);
+		return *this;
     }
-    void Animate::SetBlendModeToNone()
+
+    Animate& Animate::ChangeBlendModeToAlpha()
     {
-        image.SetBlendMode(SDL_BLENDMODE_NONE);
+		image.ChangeBlendMode(SDL_BLENDMODE_BLEND);
+		return *this;
     }
-    void Animate::SetBlendModeToAdd()
+
+    Animate& Animate::ChangeBlendModeToAdd()
     {
-        image.SetBlendMode(SDL_BLENDMODE_ADD);
+		image.ChangeBlendMode(SDL_BLENDMODE_ADD);
+		return *this;
     }
-    void Animate::SetBlendModeToMod()
+
+    Animate& Animate::ChangeBlendModeToMod()
     {
-        image.SetBlendMode(SDL_BLENDMODE_MOD);
+		image.ChangeBlendMode(SDL_BLENDMODE_MOD);
+		return *this;
     }
+
+	Animate& Animate::ChangeToEnableAdvanceAttribute()
+	{
+		is_use_angle_and_center_to_draw = true;
+		return *this;
+	}
+
+	Animate& Animate::ChangeToDisableAdvanceAttribute()
+	{
+		is_use_angle_and_center_to_draw = false;
+		return *this;
+	}
+
+	Animate& Animate::ChangeAngle(float Angle)
+	{
+		animate_angle = Angle;
+		return *this;
+	}
+
+	Animate& Animate::ChangeCenter(Point &Center)
+	{
+		animate_center = Center;
+		return *this;
+	}
+
+	Animate& Animate::ChangeFlipMode(FlipMode Mode)
+	{
+		animate_flip_mode = Mode;
+		return *this;
+	}
+
+	void Animate::DoDraw(const Rect& DrawRect)
+	{
+		float scale;
+		// source_rect
+		Rect source_rect;
+		Rect dest_rect;// = {x, y, width, height};
+		curr_frame = total_frame * ((GetTickTime() - begin_time) % total_time) / total_time;
+		source_rect.x = solo_frame_width * curr_frame;
+		source_rect.y = 0;
+		source_rect.w = solo_frame_width;
+		source_rect.h = solo_frame_height;
+
+
+		switch(element_render_style)
+		{
+		case ELEMENT_RENDER_STYLE_ADAPT:
+			if((float)width/height > (float)solo_frame_width/solo_frame_height)
+			{
+				scale = (float)height/solo_frame_height;
+				dest_rect.y = y;
+				dest_rect.x = (width - scale * solo_frame_width) * 0.5;
+			}
+			else
+			{
+				scale = (float)width/solo_frame_width;
+				dest_rect.x = x;
+				dest_rect.y = (height - scale * solo_frame_height) * 0.5;
+			}
+			dest_rect.w = scale * solo_frame_width;
+			dest_rect.h = scale * solo_frame_height;
+			break;
+
+		case ELEMENT_RENDER_STYLE_FILL:
+			if((float)width/height < (float)solo_frame_width/solo_frame_height)
+			{
+				scale = (float)height/solo_frame_height;
+				dest_rect.y = y;
+				dest_rect.x = (width -solo_frame_width * scale) * 0.5;
+			}
+			else
+			{
+				scale = (float)width/solo_frame_width;
+				dest_rect.x = x;
+				dest_rect.y = (height - solo_frame_height * scale) * 0.5;
+			}
+			dest_rect.w = scale * solo_frame_width;
+			dest_rect.h = scale * solo_frame_height;
+			break;
+
+		case ELEMENT_RENDER_STYLE_FULL:
+			dest_rect.x = x;
+			dest_rect.y = y;
+			dest_rect.w = width;
+			dest_rect.h = height;
+			break;
+		}
+
+		dest_rect.x = DrawRect.x;
+		dest_rect.y = DrawRect.y;
+		if (is_use_angle_and_center_to_draw)
+		{
+			image.RenderEx(source_rect, dest_rect, animate_angle, animate_center, SDL_FLIP_NONE);
+		}
+		else
+		{
+			image.Render(source_rect, dest_rect);
+		}
+	}
+
 }

@@ -4,13 +4,8 @@
 #include <SDL.h>
 
 namespace Orz
-{
-    enum FlipMod
-    {
-        FLIP_NONE = SDL_FLIP_NONE,
-        FLIP_LEFT_RIGHT = SDL_FLIP_HORIZONTAL,
-        FLIP_TOP_DOWN = SDL_FLIP_VERTICAL
-	};
+{	const long SHORT_SIGN_DELTA_TIME = 150;
+	const long DOUBLE_CLICK_DELTA_TIME = 150;
 
 	enum ControlDirect
 	{
@@ -20,14 +15,14 @@ namespace Orz
 
 	enum ControlMessage
 	{
-		CONTROL_MESSAGE_FUNCTION_ERROR,
+		CONTROL_MESSAGE_FUNCTION_ERROR,			
 
-		CONTROL_MESSAGE_MOUSE_OUT,	// 鼠标在控件外
-		CONTROL_MESSAGE_MOUSE_OVER,	// 鼠标在控件内
-		CONTROL_MESSAGE_MOUSE_CONST_DOWN,	// 鼠标在控件内|持续按下
-		CONTROL_MESSAGE_MOUSE_CONST_DOWN_END,// 鼠标在控件内|持续按下结束消息
-		CONTROL_MESSAGE_MOUSE_CLICK,		// 鼠标在控件内|单击
-		CONTROL_MESSAGE_MOUSE_DOUBLE_CLICK	// 鼠标在控件内|双击
+		CONTROL_MESSAGE_MOUSE_OUT,				// 鼠标在控件外
+		CONTROL_MESSAGE_MOUSE_OVER,				// 鼠标在控件内
+		CONTROL_MESSAGE_MOUSE_CONST_DOWN,		// 鼠标在控件内 with 持续按
+		CONTROL_MESSAGE_MOUSE_CONST_DOWN_END,	// 鼠标在控件内 with 持续按结束
+		CONTROL_MESSAGE_MOUSE_CLICK,			// 鼠标在控件内 with 单击
+		CONTROL_MESSAGE_MOUSE_DOUBLE_CLICK		// 鼠标在控件内 with 双击
 	};
 
 	enum ControlState
@@ -37,29 +32,70 @@ namespace Orz
 		CONTROL_STATE_MOUSE_DOWN
 	};
 
-	// 此值与读取的文件有关联,这里写什么,文件里就跟着来,必须亲自注明数值!!!
-	// 每一组设置一个默认 例如 Control
-	enum SpriteState
+	enum UiMessage
 	{
-		SPRITE_STATE_DEFAULT = 0,
-
-		SPRITE_STATE_CONTROL_MOUSE_OUT	= SPRITE_STATE_DEFAULT, // 为 0
-		SPRITE_STATE_CONTROL_MOUSE_OVER	= 1,
-		SPRITE_STATE_CONTROL_MOUSE_DOWN	= 2,
-
+		UI_MESSAGE_FUNCTION_ERROR
 	};
 
+	// 此值与读取的文件顺序有关联,这里写什么,文件里就跟着来.
+	// 必须亲自注明每一个数值!!!
+	// 每一组设置一个默认 例如 Control
+	enum UiState
+	{
+		UI_STATE_DEFAULT = 0,
+
+		UI_STATE_MOUSE_OUT = UI_STATE_DEFAULT,
+		UI_STATE_MOUSE_OVER = 1,
+		UI_STATE_MOUSE_DOWN = 2
+	};
+
+	enum ElementType
+	{
+		ELEMENT_TYPE_BASE, // base, 实际并不存在
+		ELEMENT_TYPE_ROOT,
+		ELEMENT_TYPE_ERROR,
+
+		ELEMENT_TYPE_TEXTURE,
+
+		ELEMENT_TYPE_BASE_UI, // base, 实际并不存在
+		ELEMENT_TYPE_UI_ANIMATE,
+		ELEMENT_TYPE_UI_ANIMATE_SPRITE,
+		ELEMENT_TYPE_UI_ONE_LINE_WRITER,
+		ELEMENT_TYPE_UI_WRITER,
+
+		ELEMENT_TYPE_BASE_UI_CONTROL, // base, 实际并不存在
+		ELEMENT_TYPE_UI_CONTROL_VIRTUAL,
+		ELEMENT_TYPE_UI_CONTROL_CANVAS,
+		ELEMENT_TYPE_UI_CONTROL_TEXT,
+		ELEMENT_TYPE_UI_CONTROL_BUTTON,
+		ELEMENT_TYPE_UI_CONTROL_SCROLL_BAR,
+		ELEMENT_TYPE_UI_CONTROL_LIST,
+	};
+
+	enum ElementMessage
+	{
+		ELEMENT_MESSAGE_ERROR
+	};
+
+	enum ElementState
+	{
+		ELEMENT_STATE_ERROR,
+		ELEMENT_STATE_NONE,
+		ELEMENT_STATE_CONTACT
+	};
 
 	enum ElementRenderStyle
 	{
-		ELEMENT_RENDER_STYLE_FULL,	// 铺满
-		ELEMENT_RENDER_STYLE_FILL	// 填充
+		ELEMENT_RENDER_STYLE_ADAPT,	// 适应
+		ELEMENT_RENDER_STYLE_FILL,	// 填充
+		ELEMENT_RENDER_STYLE_FULL	// 铺满
 	};
 
-	enum ControlBackgroundStyle
+	enum FlipMode
 	{
-		SOLID_COLOR, // 纯色
-		TEXTURE // 图片背景
+		FLIP_MODE_NONE = SDL_FLIP_NONE,
+		FLIP_MODE_LEFT_RIGHT = SDL_FLIP_HORIZONTAL,
+		FLIP_MODE_TOP_DOWN = SDL_FLIP_VERTICAL
 	};
 
 	enum InputKeyCode
@@ -115,6 +151,8 @@ namespace Orz
 		KEY_8,
 		KEY_9,
 
+		KEY_SPACE,
+
 		KEY_MAX
 	};
 
@@ -139,6 +177,7 @@ namespace Orz
 			return *this;
 		}
 	};
+
 
     typedef SDL_Rect Rect;
     typedef SDL_Point Point;

@@ -1,12 +1,17 @@
 
 #include "orz_base_public_resource.h"
-#include "orz_base_private_resource.h"
 
-// 平台
-Orz::_Platform platform;
+namespace Orz
+{
+	Writer error_writer;
 
-// 设备
-Orz::_Device device;
+	Animate error_animate;
 
-// 管理者
-Orz::_Manager manager;
+	BaseSDL sdl;
+
+	_Platform platform;
+
+	_Device device;
+
+	_Manager manager;
+}

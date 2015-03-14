@@ -8,12 +8,12 @@
 #define MAX_CHAR_PATH 1024
 namespace Program
 {
-	bool PlayList::LoadPlayListM3u(const char *Path)
+	bool PlayList::LoadPlayListM3u(const char *LoadPath)
 	{
 		bool succeed(true);
 		FILE *fp;
 
-		fp = fopen(Path, "r");
+		fp = fopen(LoadPath, "r");
 
 		if (fp)
 		{
@@ -22,7 +22,7 @@ namespace Program
 			int name_start_position = 0;
 			while(fgets(buff, MAX_CHAR_PATH-1, fp))
 			{
-				if (isalpha(buff[0]))
+				if (isalpha(buff[0]) && buff[0] != '\n')
 				{
 					// *重要,丢弃换行符!!!!
 					int index(0);
@@ -72,9 +72,36 @@ namespace Program
 		else
 		{
 			succeed = false;
-			Orz::error_out("PlayList::LoadPlayList - 无法打开文件\""+ std::string(Path) +"\"!");
+			Orz::error_out("PlayList::LoadPlayList - 无法打开文件\""+ std::string(LoadPath) +"\"!");
 		}
 
+		fclose(fp);
+		return succeed;
+	}
+
+	bool PlayList::SaveSongListM3u(const char *SavePath)
+	{
+		bool succeed(true);
+		FILE *fp;
+
+		fp = fopen(SavePath, "w");
+
+		if (fp)
+		{
+			std::string temp_path;
+			for (int i = 0; i < song_list.size(); i++)
+			{
+				fputs(song_list[i].path_gbk.c_str() ,fp);
+				fputs("\n" ,fp);
+			}
+		}
+		else
+		{
+			succeed = false;
+			Orz::error_out("SaveSongListM3u - 无法保存文件\""+ std::string(SavePath) +"\"!");
+		}
+
+		fp = fopen(SavePath, "r");
 		fclose(fp);
 		return succeed;
 	}

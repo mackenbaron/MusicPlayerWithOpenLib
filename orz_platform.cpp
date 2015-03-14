@@ -1,7 +1,7 @@
 
 #include "orz_platform.h"
 #include "orz_base_public_resource.h"
-#include "orz_base_private_resource.h"
+//#include "orz_base_private_resource.h"
 
 #include <Windows.h>
 #undef CreateWindow
@@ -27,6 +27,7 @@ namespace Orz
 	{
 		// 消灭事件
 		device.input.ContactWheel(0);
+		device.input.Contact(KEY_SPACE, false);
 
 		// 激活事件
 		while(SDL_PollEvent(&event))
@@ -39,6 +40,24 @@ namespace Orz
 				switch(event.key.keysym.sym)
 				{
 				case SDLK_ESCAPE:
+
+					break;
+
+				case SDLK_SPACE:
+					device.input.Contact(KEY_SPACE, true);
+					break;
+				default: break;
+				}break;
+
+			case SDL_KEYUP:
+				switch(event.key.keysym.sym)
+				{
+				case SDLK_ESCAPE:
+
+					break;
+
+				case SDLK_SPACE:
+					device.input.Contact(KEY_SPACE, false);
 					break;
 				default: break;
 				}break;

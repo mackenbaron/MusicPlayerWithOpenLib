@@ -1,15 +1,14 @@
-#ifndef ORZ_BASE_TEXTURE_H_INCLUDED
-#define ORZ_BASE_TEXTURE_H_INCLUDED
+
+#ifndef _ORZ_BASE_TEXTURE_H_INCLUDED
+#define _ORZ_BASE_TEXTURE_H_INCLUDED
 
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include <string>
 
 namespace Orz
 {
-	// 警告:此类的指针使用单一控制权的方案!!!
-    class BaseTexture
-    {
+	class BaseTexture
+	{
 	public:
 		// 构造函数
 		BaseTexture();
@@ -17,61 +16,51 @@ namespace Orz
 		// 析构函数
 		~BaseTexture();
 
-		//Loads image at specified path
-		bool CreateFromFile(std::string path);
+		// 复制构造函数
+		BaseTexture(const BaseTexture& Source);
 
-		//Creates image from font string
-		bool CreateFromRenderedText(TTF_Font* font, const char* textureText, SDL_Color textColor ); // 内码:unicode 编码方式: utf-8
+		// 复制函数
+		BaseTexture& operator=(BaseTexture& Source);
+
+		// 释放纹理
+		void Free(void);
+
+		// 加载纹理
+		bool LoadromFile(const char* FilePath);
+		bool LoadFromTextUTF8(TTF_Font* Font, const char* Text, SDL_Color Color);
 
 		// 手动创建纹理
-		bool CreateTargetTexture(int width, int height);
-		bool CreateLockAbleTexture(int width, int height);
-		bool CreateUnlockAbleTexture(int width, int height);
+		bool CreateTargetAbleTexture(int Width, int Height);
+		bool CreateLockAbleTexture(int Width, int Height);
+		bool CreateUnlockAbleTexture(int Width, int Height);
 
-		//Deallocates texture
-		void Free();
+		// 设置这个纹理为渲染目标,必须是由 CreateTargetAbleTexture 函数创建的纹理才行
+		void ChangeAsRenderTarget();
 
-		//Set color modulation
-		void SetColor( Uint8 red, Uint8 green, Uint8 blue );
+		// 改变透明度
+		BaseTexture& ChangeAlpha(uint8_t Alpha); // 0 - 255 ( 0 - 不可见, 255 - 不透明)
+		BaseTexture& ChangeColorModulation( Uint8 red, Uint8 green, Uint8 blue );
+		BaseTexture& ChangeBlendMode( SDL_BlendMode blending );
 
-		//Set blending
-		void SetBlendMode( SDL_BlendMode blending );
+		// 获取大小
+		int GetWidth(void);
+		int GetHeight(void);
+		BaseTexture& GetSizeWidth(int &Width);
+		BaseTexture& GetSizeHeight(int &Height);
+		BaseTexture& GetSize(int &Width, int &Height);
 
-		// 设置透明度/可见度(0 -255)
-		// ( 0 - 不可见, 255 - 不透明)
-		void SetAlpha( Uint8 alpha );
-
-		// 设置这个纹理为渲染目标
-		void SetAsRenderTarget();
-
-		//Renders texture at given point
-		void Draw(int X, int Y);
-		void Draw(int X, int Y, float Rate);
-
+		// 绘制
+		void Render(int X, int Y);
+		void Render(int X, int Y, float Scale);
 		void Render(const SDL_Rect& SourceRect, const SDL_Rect& DestRect);
 		void RenderEx(const SDL_Rect& SourceRect, const SDL_Rect& DestRect, const double Angle, SDL_Point& Center, SDL_RendererFlip FlipMod);
 
-		// 获得基本信息
-		SDL_Texture* GetTexture(void);
-		int GetWidth(void);
-		int GetHeight(void);
-
-		// 复制构造函数
-		BaseTexture(const BaseTexture& source);
-
-		// 复制函数
-		BaseTexture& operator=(BaseTexture& source);
-
-    private:
+	private:
 		// 转移控制权
 		void MoveControlRightTo(BaseTexture *new_controler);
-			
-		//The actual hardware texture
-		SDL_Texture* mTexture;
-
-		//Image dimensions
-		int mWidth;
-		int mHeight;
-    };
+		SDL_Texture* texture;
+		int texture_width, texture_height;
+	};
 }
-#endif // ORZ_BASE_TEXTURE_H_INCLUDED
+
+#endif

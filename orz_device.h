@@ -16,7 +16,6 @@ namespace Orz
 		bool Init();
 	public:
 
-
 		// “Ù∆µ…Ë±∏
 		BaseZPlay sound;
 

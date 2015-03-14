@@ -9,11 +9,11 @@
 
 namespace Orz
 {
-    struct Font
+    struct BaseFont
     {
     public:
-        Font();
-        ~Font();
+        BaseFont();
+        ~BaseFont();
         void Free();
 
         // 创建字体
@@ -21,8 +21,8 @@ namespace Orz
         void ChangeFontSize(int FontSize);
 
         // 根据UTF8创建文本
-        bool CreateText(const char* Text, const Color& c); // 内码:unicode 编码方式: utf-8
-        inline Texture* GetTexture();
+        bool CreateTextUTF8(const char* Text, const Color& c); // 内码:unicode 编码方式: utf-8
+		void GetTextSizeUTF8(const char *Text, int &Width, int &Height);
 
         // 字体信息
         TTF_Font *font;
@@ -30,7 +30,6 @@ namespace Orz
         BaseTexture image;
         int width, height;
         int font_size;
-		Color font_color;
     };
 }
 

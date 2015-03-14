@@ -1,2 +1,9 @@
 
-// 什么都没有~~~~ > _ <
+#include "orz_base_math.h"
+
+namespace Orz
+{
+
+
+
+}

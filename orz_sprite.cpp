@@ -2,24 +2,22 @@
 #include "orz_sprite.h"
 #include "orz_log.h"
 #include "orz_config.h"
+#include "orz_animate.h"
+#include "orz_base_public_resource.h"
 #include <string>
-
 
 namespace Orz
 {
-	Sprite::Sprite()
+	Sprite::Sprite():
+	BaseUi(ELEMENT_TYPE_UI_ANIMATE_SPRITE, 0.0f)
 	{
 	}
 
-	Sprite::~Sprite()
-	{
-		Free();
-	}
-
-	bool Sprite::LoadSprite(const char* PathName, int X, int Y, int Width, int Height)
+	bool Sprite::LoadSprite(const char *SpriteName, const char* PathName, const Rect &SpriteRect)
 	{
 		Free();
 		bool succed = true;
+		element_name = SpriteName;
 		FILE *fp;
 		fp = fopen(PathName, "r");
 
@@ -27,42 +25,12 @@ namespace Orz
 		{
 			char buff[255];
 			char var[255];
-			int read_sprite_state;
 
-			// 读取名字
-			fgets(buff, 254, fp);
-			for(int i=0; buff[i]&&i<254; i++)
-			{
-				if(buff[i] == '\"')
-				{
-					char* p = buff+i+1;
-					int j = 0;
-					for(; p[j]&&p[j]!='\"';j++)
-					{
-						var[j] = p[j];
-					}
-					var[j] = 0;
-
-					break;
-				}
-			}
-			name = var;
-			
 			// 读取状态&路径
+			int index(0);
 			while (fgets(buff, 254, fp))
 			{
-				// 读取状态
-				for(int i=0; buff[i]&&i<254; i++)
-				{
-					if(buff[i] == '=')
-					{
-						sscanf(buff + i + 1, "%d", &read_sprite_state);
-						break;
-					}
-				}
-
-				// 读取路径
-				fgets(buff, 254, fp);
+				// 读取 Animate 路径
 				for(int i=0; buff[i]&&i<254; i++)
 				{
 					if(buff[i] == '\"')
@@ -75,13 +43,15 @@ namespace Orz
 						}
 						var[j] = 0;
 
-						//error_out(std::string("var: ") + var);
-
 						break;
 					}
 				}
 
-				element.push_back(AnimateWithState(var, (SpriteState)read_sprite_state));
+				Animate *new_animate = new Animate;
+				new_animate->LoadAnimate("", var, SpriteRect);
+				new_animate->SetUiState((UiState)index);
+				ChildrenPushBack(new_animate);
+				index++;
 			}
 		}
 		else
@@ -90,151 +60,134 @@ namespace Orz
 			succed = false;
 		}
 
+		x = SpriteRect.x;
+		y = SpriteRect.y;
+		width = SpriteRect.w;
+		height = SpriteRect.h;
+
 		fclose(fp);
-
-		dest_rect.x = X;
-		dest_rect.y = Y;
-		dest_rect.w = Width;
-		dest_rect.h = Height;
-
-		curr_state = SPRITE_STATE_DEFAULT;
-
 		return succed;
 	}
 
-	void Sprite::SetAlpha(int Alpha)
+	Sprite& Sprite::ChangeBlendModeToNone()
+	{
+		for(int i=0; i < ChildrenSize(); i++)
+		{
+			if (element_type == ELEMENT_TYPE_UI_ANIMATE)
+			{
+				((Animate&)Children(i)).ChangeBlendModeToNone();
+			}
+		}
+		return *this;
+	}
+
+	Sprite& Sprite::ChangeBlendModeToAlpha()
+	{
+		for(int i=0; i < ChildrenSize(); i++)
+		{
+			if (element_type == ELEMENT_TYPE_UI_ANIMATE)
+			{
+				((Animate&)Children(i)).ChangeBlendModeToAlpha();
+			}
+		}
+		return *this;
+	}
+
+	Sprite& Sprite::ChangeBlendModeToAdd()
+	{
+		for(int i=0; i < ChildrenSize(); i++)
+		{
+			if (element_type == ELEMENT_TYPE_UI_ANIMATE)
+			{
+				((Animate&)Children(i)).ChangeBlendModeToAdd();
+			}
+		}
+		return *this;
+	}
+
+	Sprite& Sprite::ChangeBlendModeToMod()
+	{
+		for(int i=0; i < ChildrenSize(); i++)
+		{
+			if (element_type == ELEMENT_TYPE_UI_ANIMATE)
+			{
+				((Animate&)Children(i)).ChangeBlendModeToMod();
+			}
+		}
+		return *this;
+	}
+
+	void Sprite::DoDraw(const Rect& DrawRect)
+	{
+		for(int i=0; i < ChildrenSize(); i++)
+		{
+			if (Children(i).element_type == ELEMENT_TYPE_UI_ANIMATE)
+			{
+				Children(i).Hide();
+			}
+		}
+
+		int element_state_position;
+		if (parent)
+		{
+			switch(parent->element_type)
+			{
+			case ELEMENT_TYPE_UI_CONTROL_VIRTUAL	:
+			case ELEMENT_TYPE_UI_CONTROL_CANVAS		:
+			case ELEMENT_TYPE_UI_CONTROL_TEXT		:
+			case ELEMENT_TYPE_UI_CONTROL_BUTTON		:
+			case ELEMENT_TYPE_UI_CONTROL_SCROLL_BAR	:
+			case ELEMENT_TYPE_UI_CONTROL_LIST		:
+				element_state_position = ((BaseUi*)parent)->GetUiState();
+				break;
+			default:
+				element_state_position = UI_STATE_DEFAULT;
+				break;
+			}
+		}
+		else
+		{
+			element_state_position = UI_STATE_DEFAULT;
+		}
+
+		if (0 <= element_state_position && element_state_position < ChildrenSize())
+		{
+			if (Children(element_state_position).element_type == ELEMENT_TYPE_UI_ANIMATE)
+			{
+				Children(element_state_position).Show();
+			}
+		}
+	}
+
+	void Sprite::DoContact(void)
+	{
+	}
+
+	void Sprite::DoContactReset(void)
+	{
+	}
+
+	void Sprite::DoChangeAlpha(uint8_t Alpha)
 	{
 		if (Alpha != 255)
 		{
-			for(int i=0; i < element.size(); i++)
+			for(int i=0; i < ChildrenSize(); i++)
 			{
-				element[i].animate.SetBlendModeToAlpha();
-				element[i].animate.SetAlpha(Alpha);
-			}
-		}
-		else
-		{
-			for(int i=0; i < element.size(); i++)
-			{
-				element[i].animate.SetBlendModeToNone();
-			}
-		}
-	}
-
-	void Sprite::SetBlendModeToNone()
-	{
-		for(int i=0; i < element.size(); i++)
-			element[i].animate.SetBlendModeToNone();
-	}
-
-	void Sprite::SetBlendModeToAlpha()
-	{
-		for(int i=0; i < element.size(); i++)
-			element[i].animate.SetBlendModeToAlpha();
-	}
-
-	void Sprite::SetBlendModeToAdd()
-	{
-		for(int i=0; i < element.size(); i++)
-			element[i].animate.SetBlendModeToAdd();
-	}
-
-	void Sprite::SetBlendModeToMod()
-	{
-		for(int i=0; i < element.size(); i++)
-			element[i].animate.SetBlendModeToMod();
-	}
-
-	void Sprite::Contact(SpriteState CurrentState)
-	{
-		if (curr_state == CurrentState)
-		{
-			for(int i=0; i < element.size(); i++)
-			{
-				if (curr_state == element[i].state)
+				if (element_type == ELEMENT_TYPE_UI_ANIMATE)
 				{
-					element[CurrentState].animate.Contact();
+					((Animate&)Children(i)).ChangeBlendModeToAlpha();
 				}
 			}
 		}
 		else
 		{
-			curr_state = CurrentState;
-			for(int i=0; i < element.size(); i++)
+			for(int i=0; i < ChildrenSize(); i++)
 			{
-				if (curr_state == element[i].state)
+				if (element_type == ELEMENT_TYPE_UI_ANIMATE)
 				{
-					element[CurrentState].animate.ContactReset();
+					((Animate&)Children(i)).ChangeBlendModeToNone();
 				}
 			}
 		}
 	}
-
-	void Sprite::ContactReset(void)
-	{
-		for (int i = 0; i<element.size(); i++)
-		{
-			element[i].animate.ContactReset();
-		}
-	}
-
-	void Sprite::Free()
-	{
-		name.clear();
-		element.clear();
-	}
-
-	void Sprite::Draw()
-	{
-		for (int i = 0; i<element.size(); i++)
-		{
-			if (curr_state == element[i].state)
-			{
-				element[i].animate.Draw(dest_rect);
-			}
-		}
-	}
-
-	void Sprite::DrawFill()
-	{
-		for (int i = 0; i<element.size(); i++)
-		{
-			if (curr_state == element[i].state)
-			{
-				element[i].animate.DrawFill(dest_rect);
-			}
-		}
-	}
-
-	void Sprite::Draw(Rect &DestRect)
-	{
-		dest_rect = DestRect;
-		Draw();
-	}
-
-	void Sprite::DrawFill(Rect &DestRect)
-	{
-		dest_rect = DestRect;
-		DrawFill();
-	}
-
-	Sprite& Sprite::ChangePosition(int X, int Y)
-	{
-		dest_rect.x = X;
-		dest_rect.y = Y;
-		return *this;
-	}
-
-	Sprite& Sprite::ChangeSize(int Width, int Height)
-	{
-		dest_rect.w = Width;
-		dest_rect.y = Height;
-		return *this;
-	}
-
-	SpriteState Sprite::GetState(void)
-	{
-		return curr_state;
-	}
-
 }
