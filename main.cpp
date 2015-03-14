@@ -12,12 +12,12 @@ using namespace Orz;
 using namespace Program;
 
 // 屏幕宽高
-//const int ScreenWidth = 1920;
-//const int ScreenHeight = 1080;
-////const int ScreenWidth = 800;
-////const int ScreenHeight = 600;
-const int ScreenWidth = 1280;
-const int ScreenHeight = 720;
+const int ScreenWidth = 1920;
+const int ScreenHeight = 1080;
+//const int ScreenWidth = 800;
+//const int ScreenHeight = 600;
+//const int ScreenWidth = 1280;
+//const int ScreenHeight = 720;
 
 // 时间表
 MusicTimeTable total_time_table;
@@ -104,7 +104,6 @@ bool CreateScene()
 	manager.GerRoot().ChildrenPushBack(new_scroll_bar);
 
 	// list----------------------------------------------------------------
-	//Rect list_bar_rect = { , , 30, 530};
 	Rect list_rect = {0, 100, sw*(300.0/1280.), sh*(500./720.)};
 	Color list_background_color = {200, 200, 200, 255};
 	ControlList* new_control_list = new ControlList;
@@ -116,7 +115,7 @@ bool CreateScene()
 	Color bar_trough_color ={200, 200, 200, 255};
 	Color bar_bar_color ={150, 150, 150, 255};
 	new_control_scroll_bar_with_color->CreateControlScrollBarWithColor("list_bar",CONTROL_DIRECT_UP_DOWN, list_bar_rect, bar_trough_color, bar_bar_color);
-	((ControlScrollBarWithColor*)new_control_scroll_bar_with_color)->GetBar().ChangeSize(30, 40);
+	((ControlScrollBarWithColor*)new_control_scroll_bar_with_color)->GetBar().ChangeSize(36, 44);
 	manager.GerRoot().ChildrenPushBack(new_control_scroll_bar_with_color);
 
 	// 文本---------------------------------------------------------------
@@ -193,7 +192,7 @@ bool CreateScene()
 	for (int i = 0; i < play_list.GetSongList().size(); ++i)
 	{
 		((ControlList&)manager.SearchRoot("list"))
-			.PushBack
+			.PushBackControlText
 			(
 			play_list.GetSongList()[i].path_utf8.c_str(),
 			play_list.GetSongList()[i].name_utf8.c_str()
@@ -232,7 +231,7 @@ void UpdateScene_t()
 		{
 			device.sound.Play();
 			play_list.PushBackEntryGBK(path.c_str());
-			((ControlList&)manager.SearchRoot("list")).PushBack(play_list.GetSongList().back().path_utf8.c_str(), play_list.GetSongList().back().name_utf8.c_str());
+			((ControlList&)manager.SearchRoot("list")).PushBackControlText(play_list.GetSongList().back().path_utf8.c_str(), play_list.GetSongList().back().name_utf8.c_str());
 			((Writer&)manager.SearchRoot("artist_text")).ChangeTextUTF8(device.sound.GetCurrMusicID3UTF8().Artist);
 			((Writer&)manager.SearchRoot("title_text")).ChangeTextUTF8(device.sound.GetCurrMusicID3UTF8().Title);
 			play_list_position = play_list.GetSongList().size()-1;
@@ -272,7 +271,7 @@ void UpdateScene_t()
 	if (manager.SearchRoot("list").IsShow())
 	{
 		// 检测是否隐藏
-		if (mx!=0&&
+		if (mx !=0 &&
 			((ControlScrollBar&)manager.SearchRoot("list_bar")).GetControlState() == CONTROL_STATE_MOUSE_OUT
 			&&
 			((ControlList&)manager.SearchRoot("list")).GetControlState() == CONTROL_STATE_MOUSE_OUT
@@ -489,6 +488,22 @@ void UpdateScene_t()
 		else if (device.sound.GetStatue() == PAUSE || device.sound.GetStatue() == STOP)
 		{
 			device.sound.Play();
+		}
+	}
+
+	if (!manager.SearchRoot("list").IsShow())
+	{
+		if (device.input.GetMouseWheel())
+		{
+			unsigned u_sound_volume;
+			int sound_volume;
+			device.sound.GetVolume(u_sound_volume);
+			sound_volume = u_sound_volume + device.input.GetMouseWheel()*3;
+			if (sound_volume < 0)
+			{
+				sound_volume = 0;
+			}
+			device.sound.SetVolume(sound_volume);
 		}
 	}
 	

@@ -244,13 +244,19 @@ namespace Orz
 		return *this;
 	}
 
+	ControlList& ControlList::GetContentSize(int &Size)
+	{
+		Size = entry_height * ChildrenSize();
+		return *this;
+	}
+
 	ControlList& ControlList::ChangePercent(float Percent)
 	{
 		control_percent = Percent;
 		return *this;
 	}
 
-	ControlList& ControlList::PushBack(const char *ControlName, const char* Text)
+	ControlList& ControlList::PushBackControlText(const char *ControlName, const char* Text)
 	{
 		Color entry_text_background_color1 = {0x33, 0xa3, 0xdc,0};
 		Color entry_text_background_color2 = {0x7b, 0xbf, 0xea,0};
@@ -325,8 +331,6 @@ namespace Orz
 
 	void ControlList::DoDraw(const Rect& DrawRect)
 	{
-		ChangeToClip();
-
 		if(element_alpha == 255)
 		{
 			device.display.DrawFillRect(GetBackgroundColor(), DrawRect);
@@ -335,6 +339,14 @@ namespace Orz
 		{
 			device.display.DrawAlphaFillRect(GetBackgroundColor(), element_alpha, DrawRect);
 		}
+
+	}
+
+	void ControlList::DoContact()
+	{
+		BaseControl::DoContact();
+
+		ChangeToClip();
 
 		int total_entry_height = ChildrenSize() * entry_height;
 		if (total_entry_height > height)
@@ -357,12 +369,7 @@ namespace Orz
 				}
 			}
 		}
-	}
 
-	ControlList& ControlList::GetContentSize(int &Size)
-	{
-		Size = entry_height * ChildrenSize();
-		return *this;
 	}
 
 }

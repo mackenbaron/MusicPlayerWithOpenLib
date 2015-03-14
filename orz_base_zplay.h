@@ -44,6 +44,7 @@ namespace Orz
         void GetCurrTime(unsigned int &hour, unsigned int &minute, unsigned int &second);
 		void GetCurrTime(unsigned int &hour, unsigned int &minute, unsigned int &second, unsigned int &millisecond);
 		void GetCurrTime(MusicTimeTable &table);
+		void GetVolume(unsigned int &Volume);
 
 		// 获取当前文件 ID3 信息
 		const TID3InfoEx& GetCurrMusicID3GBK();
@@ -56,6 +57,7 @@ namespace Orz
 
 		// 控制歌曲
 		void SetTimeBySecond(unsigned int second);
+		void SetVolume(unsigned int Volume);
 		void Play(){player->Play();}
         void Pause(){player->Pause();}
         void Stop() {player->Stop();}

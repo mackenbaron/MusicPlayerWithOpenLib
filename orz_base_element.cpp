@@ -90,6 +90,12 @@ namespace Orz
 	{
 		// 两个矩形相减
 		// 此节点减去传递上来的矩形
+
+		if (AbsoluteRect.w == 0 || AbsoluteRect.h == 0)
+		{
+			return;
+		}
+
 		int this_x1 = x,
 			this_y1 = y,
 			this_x2 = x + width,
@@ -212,7 +218,7 @@ namespace Orz
 	{
 		if (element)
 		{
-
+			
 			// 子节点
 			for (int i = 0; i < element->children.size(); i++)
 			{
@@ -359,15 +365,15 @@ namespace Orz
 			{
 				DrawRect.x += element->x;
 				DrawRect.y += element->y;
+				DrawRect.w = element->width;
+				DrawRect.h = element->height;
 
 				if (element->IsClip())
 				{
 					Rect clip_rect;
 					element->GetAbsoluteClipDrawRect(clip_rect);
 					device.display.SetClip(clip_rect);
-					DrawRect.w = clip_rect.w;
-					DrawRect.h = clip_rect.h;
-
+					
 					if (DrawRect.w > 0 && DrawRect.h >0)
 					{
 						// 自己
@@ -383,25 +389,33 @@ namespace Orz
 						// 子节点
 						for (int i = element->children.size() - 1; i >= 0 ; i--)
 						{
+							Rect sub_rect = {DrawRect.x + element->children[i]->x,
+							DrawRect.y + element->children[i]->y,
+							element->children[i]->width,
+							element->children[i]->height};
+
+							// 子节点不在矩形内
+							if (sub_rect.x + sub_rect.w <= DrawRect.x
+								||sub_rect.y + sub_rect.h <= DrawRect.y
+								||DrawRect.x + element->width <= sub_rect.x
+								||DrawRect.y + element->height <= sub_rect.y
+								)
+								continue;
+
 							Rect sub_real_draw_rect = DrawRect;
 							element->DrawSub(element->children[i], sub_real_draw_rect);
 						}
 					}
 					device.display.SetClipToNull();
-
-
 #ifdef CodeDebug
 					// 画出外边框线条来
 					device.display.DrawOutlineRect(OriginColor, clip_rect);
-					Rect in_rect = {clip_rect.x+1, clip_rect.y+1, clip_rect.w+1, clip_rect.h+1};
-					device.display.DrawOutlineRect(OriginColor, in_rect);
+					//Rect in_rect = {clip_rect.x+1, clip_rect.y+1, clip_rect.w+1, clip_rect.h+1};
+					//device.display.DrawOutlineRect(OriginColor, in_rect);
 #endif
 				}
 				else
 				{
-					DrawRect.w = element->width;
-					DrawRect.h = element->height;
-
 					// 自己
 					element->DoDraw(DrawRect);
 

@@ -27,7 +27,6 @@ namespace Orz
 		ControlMessage GetControlMessage(void);
 		ControlState GetControlState(void);
 	
-	private:
 
 		// DoContact 函数中---------------------------------------------------------------	|
 		// 六种理想信号:																	  	|
@@ -67,9 +66,10 @@ namespace Orz
 		//_________|       |_________________________    短信号						   		|
 		// ________________________________________________________________________________	|
 
-		virtual void DoContact(void);
-		virtual void DoContactReset(void);
+		void DoContactReset(void); // 注意使用本函数!
+		void DoContact(void);
 
+	private:
 		// 背景颜色
 		Color control_background_color;
 

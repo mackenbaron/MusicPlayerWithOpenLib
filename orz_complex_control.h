@@ -89,12 +89,12 @@ namespace Orz
 		ControlList& ChangePercent(float Percent);
 
 		// 列表操作
-		ControlList& PushBack(const char *ControlName, const char* Text);
+		ControlList& PushBackControlText(const char *ControlName, const char* Text);
 		ControlList& Insert(int Position, const char *ControlName, const char* Text); // 在 Position-1 和 Position 之间插入元素
 
 	private:
 		void DoDraw(const Rect& DrawRect);
-
+		void DoContact();
 		// 列表属性
 		BaseFont list_font;
 

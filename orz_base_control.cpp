@@ -30,7 +30,7 @@ namespace Orz
 
 		if (IsShow() == false)
 			return;
-	
+
 		// 测试是否在元素内
 		if ( 0 <= mx && mx < width && 0 <= my && my <= height)
 			is_mouse_over = true;

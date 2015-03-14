@@ -282,6 +282,16 @@ namespace Orz
 		player->Seek(tfSecond, &temp_time_table, smFromBeginning);
 	}
 
+	void BaseZPlay::SetVolume(unsigned int Volume)
+	{
+		player->SetMasterVolume(Volume, Volume);
+	}
+
+	void BaseZPlay::GetVolume(unsigned int &Volume)
+	{
+		player->GetMasterVolume(&Volume, &Volume);
+	}
+
 }
 
 
