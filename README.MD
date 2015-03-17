@@ -8,7 +8,7 @@ v 0.0.5<br>
 2.运行main.exe<br>
 2.拖拽文件以播放<br>
 
-<br>---------------------------------------------------------
+<br>---------------------------------------------------------<br>
 0.downlad RainMusicPlayer.7z.zip and main.exe<br>
 1.unzip.<br>
 2.using lastest main.exe replace old main.exe to update program.<br>
